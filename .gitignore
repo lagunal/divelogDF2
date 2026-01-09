@@ -1,0 +1,96 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks of VS Code
+# that you may wish to be included in the version control.
+# .vscode/
+
+# Flutter/Dart related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Ephemeral/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/flutter_tools_bundle.sh
+**/ios/Flutter/podhelper.rb
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/.pub-cache/
+**/.pub/
+**/build/
+/flutter_*.png
+/flutter_*.svg
+/flutter_*.ico
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android related
+**/android/**/generated/
+**/android/key.properties
+**/android/local.properties
+**/android/app/google-services.json
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/android/captures/
+**/android/*.iml
+**/android/*.jks
+**/android/*.keystore
+**/android/*.p12
+**/android/*.google_play_services_key.json
+
+# iOS related
+**/ios/**/GeneratedFiles/
+**/ios/Pods/
+**/ios/Runner.xcworkspace/xcuserdata/
+**/ios/.generated/
+**/ios/.pif/
+**/ios/*.mode1v3
+**/ios/*.mode2v3
+**/ios/*.perspectivev3
+**/ios/DerivedData/
+**/ios/Runner/GeneratedPluginRegistrant.[mh]
+**/ios/Runner/GeneratedPluginRegistrant.swift
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GoogleService-Info.plist
+
+# Web related
+**/web/index.html.gz
+**/web/main.dart.js
+**/web/main.dart.js.map
+**/web/main.dart.js.tar.gz
+
+# Coverage related
+**/coverage/
+
+# Mac files
+.DS_Store
