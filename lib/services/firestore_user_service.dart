@@ -8,7 +8,7 @@ class FirestoreUserService {
   factory FirestoreUserService() => _instance;
   FirestoreUserService._internal();
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
   final FirestoreDiveService _diveService = FirestoreDiveService();
 
   CollectionReference<Map<String, dynamic>> get _usersCollection =>

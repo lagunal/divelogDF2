@@ -9,7 +9,7 @@ class FirestoreDiveService {
   FirestoreDiveService._internal();
 
   final _uuid = const Uuid();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> get _divesCollection =>
       _firestore.collection('dive_sessions');

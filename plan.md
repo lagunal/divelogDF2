@@ -344,16 +344,17 @@ Each dive session will capture the following information:
 - [ ] Security: Rules checks via emulator for authenticated access
 
 ### Phase 5: Enhanced Features
-- [ ] Reusable Widgets
-  - [ ] DiveCard component
-  - [ ] StatCard component
-  - [ ] Custom form fields
-- [ ] Data Validation
-  - [ ] Input validators
-  - [ ] Safety checks (depth limits, etc.)
+- [x] Reusable Widgets
+  - [x] DiveCard component
+  - [x] StatCard component
+  - [x] Custom form fields (`CustomTextField` implemented)
+- [x] Data Validation
+  - [x] Input validators (`Validators` class implemented)
+  - [x] Safety checks (depth limits, etc. implemented in validators)
 - [ ] Error Handling
-  - [ ] User-friendly error messages
-  - [ ] Logging with debugPrint
+  - [ ] User-friendly error messages (Partially done in screens)
+  - [ ] Logging with debugPrint (Done in services)
+  - [ ] Global error handler / Error Boundary
 
 #### Testing (Phase 5) — Definition of Done
 - [ ] Unit: Validators (depth limits, numeric formats) edge cases

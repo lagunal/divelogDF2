@@ -10,14 +10,16 @@ import 'package:divelogtest/screens/add_edit_dive_screen.dart';
 import 'package:intl/intl.dart';
 
 class DiveListScreen extends StatefulWidget {
-  const DiveListScreen({super.key});
+  final DiveService? diveService;
+
+  const DiveListScreen({super.key, this.diveService});
 
   @override
   State<DiveListScreen> createState() => _DiveListScreenState();
 }
 
 class _DiveListScreenState extends State<DiveListScreen> {
-  final DiveService _diveService = DiveService();
+  late final DiveService _diveService;
   final ExportService _exportService = ExportService();
   List<DiveSession> _allDives = [];
   List<DiveSession> _filteredDives = [];
@@ -33,6 +35,7 @@ class _DiveListScreenState extends State<DiveListScreen> {
   @override
   void initState() {
     super.initState();
+    _diveService = widget.diveService ?? DiveService();
     _loadDives();
   }
 

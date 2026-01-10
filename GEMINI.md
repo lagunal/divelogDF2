@@ -4,14 +4,16 @@
 **Dive Log App** is a cross-platform mobile application (Android/iOS/Web) designed for divers to log and track their diving sessions. It features a professional logbook for certification and safety, with offline-first capabilities and cloud synchronization.
 
 ## Current Status
-**Active Phase:** Phase 5 (Enhanced Features) - Starting.
+**Active Phase:** Phase 5 (Enhanced Features) - Started.
 - **Completed:**
     - Phase 1: Project Setup & Models.
     - Phase 2: Core Services (SQflite migration).
     - Phase 3: UI Implementation.
-    - Phase 4: Firebase Setup, Auth, Firestore DB, Offline Support & Sync, Export Dive Logs (PDF/CSV).
+    - Phase 4: Firebase Integration (Auth, Firestore, Sync, Export).
 - **Pending (Immediate Focus):**
     - **Phase 5:** Enhanced Features (Reusable widgets, Data Validation, Error Handling).
+    - **Phase 6:** Polish & Optimization.
+    - **Phase 7:** Payments & Subscriptions.
 
 ## Architecture & Tech Stack
 - **Framework:** Flutter (Latest stable)

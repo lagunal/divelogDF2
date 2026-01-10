@@ -7,19 +7,22 @@ import 'package:divelogtest/theme.dart';
 import 'package:intl/intl.dart';
 
 class StatisticsScreen extends StatefulWidget {
-  const StatisticsScreen({super.key});
+  final UserService? userService;
+
+  const StatisticsScreen({super.key, this.userService});
 
   @override
   State<StatisticsScreen> createState() => _StatisticsScreenState();
 }
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
-  final UserService _userService = UserService();
+  late final UserService _userService;
   String? _userId;
 
   @override
   void initState() {
     super.initState();
+    _userService = widget.userService ?? UserService();
     _initializeUser();
   }
 

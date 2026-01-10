@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:divelogtest/widgets/dive_card.dart';
 import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/theme.dart';
+import '../utils/test_theme.dart';
 
 void main() {
   group('DiveCard Widget Tests', () {
@@ -43,7 +43,7 @@ void main() {
     testWidgets('displays dive location and operator', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: Scaffold(
             body: DiveCard(
               dive: testDiveSession,
@@ -63,7 +63,7 @@ void main() {
     testWidgets('displays dive statistics (depth, time, temperature)', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: Scaffold(
             body: DiveCard(
               dive: testDiveSession,
@@ -86,7 +86,7 @@ void main() {
     testWidgets('has location icon', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: Scaffold(
             body: DiveCard(
               dive: testDiveSession,
@@ -108,7 +108,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: Scaffold(
             body: DiveCard(
               dive: testDiveSession,
@@ -129,7 +129,7 @@ void main() {
     testWidgets('renders correctly in light theme', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: Scaffold(
             body: DiveCard(
               dive: testDiveSession,
@@ -149,7 +149,7 @@ void main() {
     testWidgets('renders correctly in dark theme', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: darkTheme,
+          theme: ThemeData.dark(), // Use default dark theme
           home: Scaffold(
             body: DiveCard(
               dive: testDiveSession,
@@ -184,13 +184,15 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: Scaffold(
-            body: SizedBox(
-              width: 300,
-              child: DiveCard(
-                dive: longNameDive,
-                onTap: () {},
+            body: Center(
+              child: SizedBox(
+                width: 350,
+                child: DiveCard(
+                  dive: longNameDive,
+                  onTap: () {},
+                ),
               ),
             ),
           ),

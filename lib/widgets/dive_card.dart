@@ -82,23 +82,23 @@ class DiveCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              Row(
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   _InfoChip(
                     icon: Icons.arrow_downward,
                     label: '${dive.maximaProfundidad}m',
                     color: colorScheme.primary,
                   ),
-                  const SizedBox(width: 8),
                   _InfoChip(
                     icon: Icons.schedule,
                     label: '${dive.tiempoFondo.toStringAsFixed(0)}min',
                     color: colorScheme.secondary,
                   ),
-                  const SizedBox(width: 8),
                   _InfoChip(
                     icon: Icons.thermostat,
-                    label: '${dive.temperaturaAgua}°C',
+                    label: '${dive.temperaturaAgua.toStringAsFixed(0)}°C',
                     color: Colors.orange,
                   ),
                 ],

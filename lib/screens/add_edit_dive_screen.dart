@@ -6,6 +6,8 @@ import 'package:divelogtest/services/dive_service.dart';
 import 'package:divelogtest/services/user_service.dart';
 import 'package:divelogtest/services/export_service.dart';
 import 'package:divelogtest/theme.dart';
+import 'package:divelogtest/widgets/custom_text_field.dart';
+import 'package:divelogtest/utils/validators.dart';
 
 class AddEditDiveScreen extends StatefulWidget {
   final DiveSession? existingDive;
@@ -31,11 +33,6 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
   late TextEditingController _direccionController;
   late TextEditingController _lugarBuceoController;
   late TextEditingController _supervisorController;
-  //late TextEditingController _tablaBuceoController;
-  //late TextEditingController _aparatoController;
-  //late TextEditingController _presionController;
-  //late TextEditingController _tipoTrajeController;
-  //late TextEditingController _mezclaController;
   late TextEditingController _visibilidadController;
   late TextEditingController _tempSuperiorController;
   late TextEditingController _tempAguaController;
@@ -79,11 +76,6 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
     _direccionController = TextEditingController();
     _lugarBuceoController = TextEditingController();
     _supervisorController = TextEditingController();
-    // _tablaBuceoController = TextEditingController();
-    //_aparatoController = TextEditingController();
-    //_presionController = TextEditingController();
-    //_tipoTrajeController = TextEditingController();
-    //_mezclaController = TextEditingController();
     _visibilidadController = TextEditingController();
     _tempSuperiorController = TextEditingController();
     _tempAguaController = TextEditingController();
@@ -106,11 +98,6 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
     _direccionController.text = dive.direccionOperadora;
     _lugarBuceoController.text = dive.lugarBuceo;
     _supervisorController.text = dive.supervisorBuceo;
-   // _tablaBuceoController.text = dive.tablaBuceo;
-    //_aparatoController.text = dive.aparatoRespiratorio;
-    //_presionController.text = dive.presionCilindro.toString();
-    //_tipoTrajeController.text = dive.tipoTraje;
-    //_mezclaController.text = dive.mezclaUtilizada;
     _visibilidadController.text = dive.visibilidad.toString();
     _tempSuperiorController.text = dive.temperaturaSuperior.toString();
     _tempAguaController.text = dive.temperaturaAgua.toString();
@@ -143,11 +130,6 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
     _direccionController.dispose();
     _lugarBuceoController.dispose();
     _supervisorController.dispose();
-   // _tablaBuceoController.dispose();
-    //_aparatoController.dispose();
-    //_presionController.dispose();
-    //_tipoTrajeController.dispose();
-    //_mezclaController.dispose();
     _visibilidadController.dispose();
     _tempSuperiorController.dispose();
     _tempAguaController.dispose();
@@ -221,11 +203,6 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
         tipoBuceo: _tipoBuceoSeleccionado,
         nombreBuzos: buzos,
         supervisorBuceo: _supervisorController.text,
-        //tablaBuceo: _tablaBuceoController.text,
-        //aparatoRespiratorio: _aparatoController.text,
-        //presionCilindro: double.parse(_presionController.text),
-        //tipoTraje: _tipoTrajeController.text,
-        //mezclaUtilizada: _mezclaController.text,
         estadoMar: _estadoMarSeleccionado,
         visibilidad: _parseDouble(_visibilidadController.text),
         temperaturaSuperior: _parseDouble(_tempSuperiorController.text),
@@ -362,12 +339,6 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
               _buildSectionHeader(context, '📋 Información General'),
               _buildGeneralInfoSection(),
               const SizedBox(height: AppSpacing.lg),
-              //_buildSectionHeader(context, '🤿 Equipo de Buceo'),
-              //_buildEquipmentSection(),
-              //const SizedBox(height: AppSpacing.lg),
-              //_buildSectionHeader(context, '🌊 Condiciones del Agua'),
-              //_buildWaterConditionsSection(),
-              //const SizedBox(height: AppSpacing.lg),
               _buildSectionHeader(context, '⏱️ Detalles de la Inmersión'),
               _buildDiveDetailsSection(context),
               const SizedBox(height: AppSpacing.lg),
@@ -394,32 +365,36 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
   Widget _buildGeneralInfoSection() {
     return Column(
       children: [
-        _buildTextField(
+        CustomTextField(
           controller: _clienteController,
           label: 'Cliente',
-          icon: Icons.person,
+          prefixIcon: Icons.person,
           required: true,
+          validator: Validators.required,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _operadoraController,
           label: 'Operadora de Buceo',
-          icon: Icons.business,
+          prefixIcon: Icons.business,
           required: true,
+          validator: Validators.required,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _direccionController,
           label: 'Dirección de la Operadora',
-          icon: Icons.location_on,
+          prefixIcon: Icons.location_on,
           required: true,
+          validator: Validators.required,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _lugarBuceoController,
           label: 'Lugar de Buceo',
-          icon: Icons.place,
+          prefixIcon: Icons.place,
           required: true,
+          validator: Validators.required,
         ),
         const SizedBox(height: AppSpacing.md),
         _buildDropdown(
@@ -437,11 +412,12 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
         const SizedBox(height: AppSpacing.md),
         _buildDiversSection(),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _supervisorController,
           label: 'Supervisor de Buceo',
-          icon: Icons.supervisor_account,
+          prefixIcon: Icons.supervisor_account,
           required: true,
+          validator: Validators.required,
         ),
       ],
     );
@@ -504,48 +480,6 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
     );
   }
 
-  // Widget _buildEquipmentSection() {
-  //   return Column(
-  //     children: [
-  //       // _buildTextField(
-  //       //   controller: _tablaBuceoController,
-  //       //   label: 'Tabla de Buceo',
-  //       //   icon: Icons.table_chart,
-  //       //   required: true,
-  //       // ),
-  //       // const SizedBox(height: AppSpacing.md),
-  //       // _buildTextField(
-  //       //   controller: _aparatoController,
-  //       //   label: 'Aparato Respiratorio',
-  //       //   icon: Icons.masks,
-  //       //   required: true,
-  //       // ),
-  //       // const SizedBox(height: AppSpacing.md),
-  //       // _buildTextField(
-  //       //   controller: _presionController,
-  //       //   label: 'Presión Cilindro (bar)',
-  //       //   icon: Icons.speed,
-  //       //   keyboardType: TextInputType.number,
-  //       //   required: true,
-  //       // ),
-  //       // const SizedBox(height: AppSpacing.md),
-  //       // _buildTextField(
-  //       //   controller: _tipoTrajeController,
-  //       //   label: 'Tipo de Traje',
-  //       //   icon: Icons.checkroom,
-  //       //   required: true,
-  //       // ),
-  //       // const SizedBox(height: AppSpacing.md),
-  //       // _buildTextField(
-  //       //   controller: _mezclaController,
-  //       //   label: 'Mezcla Utilizada',
-  //       //   icon: Icons.air,
-  //       //   required: true,
-  //       // ),
-  //    ],
-  //  );
-  //}
-
   Widget _buildWaterConditionsSection() {
     return Column(
       children: [
@@ -559,35 +493,39 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           onChanged: (value) => setState(() => _estadoMarSeleccionado = value!),
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _visibilidadController,
           label: 'Visibilidad (metros)',
-          icon: Icons.visibility,
+          prefixIcon: Icons.visibility,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.number,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _tempSuperiorController,
           label: 'Temperatura Superior (°C)',
-          icon: Icons.thermostat,
+          prefixIcon: Icons.thermostat,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.temperature,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _tempAguaController,
           label: 'Temperatura Agua (°C)',
-          icon: Icons.water,
+          prefixIcon: Icons.water,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.temperature,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _corrienteController,
           label: 'Corriente de Agua',
-          icon: Icons.arrow_forward,
+          prefixIcon: Icons.arrow_forward,
           required: true,
+          validator: Validators.required,
         ),
         const SizedBox(height: AppSpacing.md),
         _buildDropdown(
@@ -626,36 +564,40 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           dateFormat: dateFormat,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _profundidadController,
           label: 'Máxima Profundidad (metros)',
-          icon: Icons.arrow_downward,
+          prefixIcon: Icons.arrow_downward,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.depth,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _tiempoIntervalController,
           label: 'Tiempo de Intervalo en Superficie (min)',
-          icon: Icons.timer,
+          prefixIcon: Icons.timer,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.number,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _tiempoFondoController,
           label: 'Tiempo de Fondo (min)',
-          icon: Icons.schedule,
+          prefixIcon: Icons.schedule,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.number,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _tiempoTotalController,
           label: 'Tiempo Total de Inmersión (min)',
-          icon: Icons.hourglass_full,
+          prefixIcon: Icons.hourglass_full,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.number,
         ),
         const SizedBox(height: AppSpacing.md),
         _buildDateTimeField(
@@ -690,76 +632,48 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
   Widget _buildWorkSafetySection() {
     return Column(
       children: [
-        _buildTextField(
+        CustomTextField(
           controller: _descripcionController,
           label: 'Descripción del Trabajo',
-          icon: Icons.description,
+          prefixIcon: Icons.description,
           maxLines: 3,
           required: true,
+          validator: Validators.required,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _descompresionController,
           label: 'Descompresión Utilizada',
-          icon: Icons.safety_check,
+          prefixIcon: Icons.safety_check,
           required: true,
+          validator: Validators.required,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _enfermedadController,
           label: 'Enfermedad o Lesión (Opcional)',
-          icon: Icons.medical_services,
+          prefixIcon: Icons.medical_services,
           maxLines: 2,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _tiempoSupervisionController,
           label: 'Tiempo de Supervisión Acumulado (hrs)',
-          icon: Icons.watch_later,
+          prefixIcon: Icons.watch_later,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.number,
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildTextField(
+        CustomTextField(
           controller: _tiempoBuceoAcumController,
           label: 'Tiempo de Buceo Acumulado (hrs)',
-          icon: Icons.access_alarm,
+          prefixIcon: Icons.access_alarm,
           keyboardType: TextInputType.number,
           required: true,
+          validator: Validators.number,
         ),
       ],
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
-    bool required = false,
-  }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        filled: true,
-        fillColor: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest
-            .withValues(alpha: 0.3),
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md)),
-      ),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator: required
-          ? (value) => value?.isEmpty ?? true ? 'Campo requerido' : null
-          : null,
-      inputFormatters: keyboardType == TextInputType.number
-          ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))]
-          : null,
     );
   }
 
@@ -772,7 +686,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
     required void Function(T?) onChanged,
   }) {
     return DropdownButtonFormField<T>(
-      initialValue: value,
+      value: value,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),

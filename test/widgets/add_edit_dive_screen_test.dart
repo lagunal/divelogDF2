@@ -34,7 +34,11 @@ void main() {
     expect(find.textContaining('Buzo 1'), findsOneWidget);
 
     // Add a diver
-    await tester.tap(find.widgetWithText(TextButton, 'Agregar'));
+    // Scroll down to ensure button is visible
+    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    
+    await tester.tap(find.text('Agregar'));
     await tester.pumpAndSettle();
 
     // Now we should see Buzo 2

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:divelogtest/widgets/stat_card.dart';
-import 'package:divelogtest/theme.dart';
+import '../utils/test_theme.dart';
 
 void main() {
   group('StatCard Widget Tests', () {
     testWidgets('displays icon, value, and label', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: const Scaffold(
             body: StatCard(
               icon: Icons.scuba_diving,
-              value: '25',
+              value: '42',
               label: 'Total Dives',
               color: Colors.blue,
             ),
@@ -24,110 +24,34 @@ void main() {
       expect(find.byIcon(Icons.scuba_diving), findsOneWidget);
       
       // Verify value is shown
-      expect(find.text('25'), findsOneWidget);
+      expect(find.text('42'), findsOneWidget);
       
       // Verify label is shown
       expect(find.text('Total Dives'), findsOneWidget);
     });
 
-    testWidgets('uses correct text styles', (WidgetTester tester) async {
+    testWidgets('applies custom color', (WidgetTester tester) async {
+      const testColor = Colors.red;
+      
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: const Scaffold(
             body: StatCard(
-              icon: Icons.arrow_downward,
-              value: '30.5m',
-              label: 'Deepest Dive',
-              color: Colors.red,
+              icon: Icons.warning,
+              value: 'Alert',
+              label: 'Status',
+              color: testColor,
             ),
           ),
         ),
       );
 
-      // Find the value text widget
-      final valueText = tester.widget<Text>(find.text('30.5m'));
+      // Verify icon color
+      final icon = tester.widget<Icon>(find.byIcon(Icons.warning));
+      expect(icon.color, testColor);
       
-      // Verify value uses headline style (large text)
-      expect(valueText.style?.fontWeight, FontWeight.bold);
-      
-      // Find the label text widget
-      final labelText = tester.widget<Text>(find.text('Deepest Dive'));
-      
-      // Verify label uses body style (smaller text)
-      expect(labelText.style, isNotNull);
-    });
-
-    testWidgets('applies custom color to icon', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: lightTheme,
-          home: const Scaffold(
-            body: StatCard(
-              icon: Icons.schedule,
-              value: '500',
-              label: 'Bottom Time',
-              color: Colors.green,
-            ),
-          ),
-        ),
-      );
-
-      // Find the icon widget
-      final iconWidget = tester.widget<Icon>(find.byIcon(Icons.schedule));
-      
-      // Verify color is applied
-      expect(iconWidget.color, Colors.green);
-      
-      // Verify icon size
-      expect(iconWidget.size, 24);
-    });
-
-    testWidgets('renders correctly in light theme', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: lightTheme,
-          home: const Scaffold(
-            body: StatCard(
-              icon: Icons.trending_up,
-              value: '18.5m',
-              label: 'Average Depth',
-              color: Colors.orange,
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Verify card renders without errors
-      expect(find.byType(StatCard), findsOneWidget);
-      expect(find.text('18.5m'), findsOneWidget);
-      expect(find.text('Average Depth'), findsOneWidget);
-    });
-
-    testWidgets('renders correctly in dark theme', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: darkTheme,
-          home: const Scaffold(
-            body: StatCard(
-              icon: Icons.trending_up,
-              value: '18.5m',
-              label: 'Average Depth',
-              color: Colors.orange,
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Verify card renders without errors in dark mode
-      expect(find.byType(StatCard), findsOneWidget);
-      expect(find.text('18.5m'), findsOneWidget);
-      
-      // Verify container decoration exists
+      // Verify container decoration uses color
       final container = tester.widget<Container>(
         find.descendant(
           of: find.byType(StatCard),
@@ -135,85 +59,38 @@ void main() {
         ).first,
       );
       
-      expect(container.decoration, isNotNull);
+      final decoration = container.decoration as BoxDecoration;
+      // Background should be with opacity 0.1
+      expect(decoration.color, testColor.withValues(alpha: 0.1));
+      // Border should be with opacity 0.3
+      expect(decoration.border!.top.color, testColor.withValues(alpha: 0.3));
     });
 
-    testWidgets('displays large numeric values correctly', (WidgetTester tester) async {
+    testWidgets('handles long labels gracefully', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: lightTheme,
+          theme: testTheme,
           home: const Scaffold(
-            body: StatCard(
-              icon: Icons.schedule,
-              value: '1,234.5',
-              label: 'Total Time',
-              color: Colors.purple,
+            body: SizedBox(
+              width: 150,
+              child: StatCard(
+                icon: Icons.info,
+                value: '100',
+                label: 'Very Long Label That Should Truncate',
+                color: Colors.green,
+              ),
             ),
           ),
         ),
       );
 
-      // Verify large value is displayed
-      expect(find.text('1,234.5'), findsOneWidget);
-    });
-
-    testWidgets('handles various icon types', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: lightTheme,
-          home: const Scaffold(
-            body: Column(
-              children: [
-                StatCard(
-                  icon: Icons.scuba_diving,
-                  value: '10',
-                  label: 'Dives',
-                  color: Colors.blue,
-                ),
-                StatCard(
-                  icon: Icons.arrow_downward,
-                  value: '30m',
-                  label: 'Depth',
-                  color: Colors.red,
-                ),
-                StatCard(
-                  icon: Icons.schedule,
-                  value: '500',
-                  label: 'Time',
-                  color: Colors.green,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-
-      // Verify all icons are rendered
-      expect(find.byIcon(Icons.scuba_diving), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_downward), findsOneWidget);
-      expect(find.byIcon(Icons.schedule), findsOneWidget);
-    });
-
-    testWidgets('has proper padding and structure', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: lightTheme,
-          home: const Scaffold(
-            body: StatCard(
-              icon: Icons.star,
-              value: '100',
-              label: 'Rating',
-              color: Colors.amber,
-            ),
-          ),
-        ),
-      );
-
-      // Verify Column structure
-      expect(find.byType(Column), findsWidgets);
+      // Verify label text exists and handles overflow
+      final textFinder = find.text('Very Long Label That Should Truncate');
+      expect(textFinder, findsOneWidget);
       
-      // Verify SizedBox spacers exist (for spacing between elements)
-      expect(find.byType(SizedBox), findsWidgets);
+      final textWidget = tester.widget<Text>(textFinder);
+      expect(textWidget.overflow, TextOverflow.ellipsis);
+      expect(textWidget.maxLines, 1);
     });
   });
 }

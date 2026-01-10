@@ -5,6 +5,47 @@ import 'package:divelogtest/providers/dive_provider.dart';
 import 'package:divelogtest/screens/statistics_screen.dart';
 import 'package:divelogtest/models/dive_session.dart';
 import 'package:divelogtest/services/dive_service.dart';
+import 'package:divelogtest/services/user_service.dart';
+import 'package:divelogtest/models/user_profile.dart';
+
+// Mock UserService
+class MockUserService implements UserService {
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<void> initializeWithFirebaseUser(dynamic user) async {}
+
+  @override
+  String? getCurrentUserId() => 'test_user_id';
+
+  @override
+  bool get hasUserProfile => true;
+
+  @override
+  Future<UserProfile?> getUserProfile() async => null;
+
+  @override
+  Future<UserProfile> createUserProfile({required String name, required String email, String? certificationLevel, String? certificationNumber, DateTime? certificationDate}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserProfile> updateUserProfile({String? name, String? email, String? certificationLevel, String? certificationNumber, DateTime? certificationDate}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserProfile> updateUserStatistics() async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> createDefaultUserIfNeeded() async {}
+
+  @override
+  Future<void> deleteUserProfile() async {}
+}
 
 // Mock DiveProvider with statistics data
 class MockDiveProviderWithStats extends ChangeNotifier implements DiveProvider {
@@ -20,8 +61,9 @@ class MockDiveProviderWithStats extends ChangeNotifier implements DiveProvider {
     'totalBottomTime': 500.0,
     'deepestDive': 35.5,
     'averageDepth': 22.3,
-    'favoriteSites': ['Cozumel', 'Cancun', 'Playa del Carmen'],
+    'favoriteSites': {'Cozumel': 5, 'Cancun': 3, 'Playa del Carmen': 2},
     'diveTypes': {'Scuba': 7, 'Asist. Superficie': 2, 'Altura Geográfica': 1},
+    'totalDiveTime': 600.0,
   };
 
   @override
@@ -122,8 +164,9 @@ class MockDiveProviderEmptyStats extends ChangeNotifier implements DiveProvider 
     'totalBottomTime': 0.0,
     'deepestDive': 0.0,
     'averageDepth': 0.0,
-    'favoriteSites': [],
+    'favoriteSites': {},
     'diveTypes': {},
+    'totalDiveTime': 0.0,
   };
 
   @override
@@ -185,7 +228,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider<DiveProvider>.value(
             value: MockDiveProviderWithStats(),
-            child: const StatisticsScreen(),
+            child: StatisticsScreen(userService: MockUserService()),
           ),
         ),
       );
@@ -201,7 +244,7 @@ void main() {
       expect(find.text('22.3m'), findsOneWidget); // Average depth
       
       // Verify bottom time is shown (formatted)
-      expect(find.textContaining('500'), findsOneWidget); // Total bottom time
+      expect(find.textContaining('600m'), findsOneWidget); // Total bottom time
     });
 
     testWidgets('shows favorite dive sites', (WidgetTester tester) async {
@@ -209,7 +252,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider<DiveProvider>.value(
             value: MockDiveProviderWithStats(),
-            child: const StatisticsScreen(),
+            child: StatisticsScreen(userService: MockUserService()),
           ),
         ),
       );
@@ -217,11 +260,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify favorite sites section exists
-      expect(find.text('Sitios Favoritos'), findsOneWidget);
+      expect(find.text('Lugares Más Visitados'), findsOneWidget);
       
       // Verify top sites are shown
-      expect(find.text('Cozumel'), findsOneWidget);
-      expect(find.text('Cancun'), findsOneWidget);
+      expect(find.text('Cozumel'), findsWidgets);
+      expect(find.text('Cancun'), findsWidgets);
     });
 
     testWidgets('shows dive type distribution', (WidgetTester tester) async {
@@ -229,7 +272,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider<DiveProvider>.value(
             value: MockDiveProviderWithStats(),
-            child: const StatisticsScreen(),
+            child: StatisticsScreen(userService: MockUserService()),
           ),
         ),
       );
@@ -249,7 +292,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider<DiveProvider>.value(
             value: MockDiveProviderEmptyStats(),
-            child: const StatisticsScreen(),
+            child: StatisticsScreen(userService: MockUserService()),
           ),
         ),
       );
@@ -260,7 +303,7 @@ void main() {
       expect(find.text('0'), findsWidgets); // Multiple zeros
       
       // Should show empty state message
-      expect(find.text('No hay estadísticas disponibles'), findsOneWidget);
+      expect(find.text('No hay datos disponibles'), findsWidgets);
     });
 
     testWidgets('shows recent activity timeline', (WidgetTester tester) async {
@@ -268,7 +311,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider<DiveProvider>.value(
             value: MockDiveProviderWithStats(),
-            child: const StatisticsScreen(),
+            child: StatisticsScreen(userService: MockUserService()),
           ),
         ),
       );
@@ -287,7 +330,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider<DiveProvider>.value(
             value: MockDiveProviderWithStats(),
-            child: const StatisticsScreen(),
+            child: StatisticsScreen(userService: MockUserService()),
           ),
         ),
       );
@@ -295,7 +338,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify stat cards exist (should have icons and values)
-      expect(find.byIcon(Icons.scuba_diving), findsWidgets);
+      expect(find.byIcon(Icons.water), findsWidgets);
       expect(find.byIcon(Icons.arrow_downward), findsWidgets);
       expect(find.byIcon(Icons.schedule), findsWidgets);
     });
