@@ -1,10 +1,10 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-// Avoid path_provider in analyzer-only/test contexts; use sqflite's getDatabasesPath
-import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'dart:convert';
 
 class DatabaseHelper {
+  static final Logger _log = Logger('DatabaseHelper');
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   static Database? _database;
 
@@ -31,7 +31,7 @@ class DatabaseHelper {
         onUpgrade: _onUpgrade,
       );
     } catch (e) {
-      debugPrint('Error initializing database: $e');
+      _log.severe('Error initializing database', e);
       rethrow;
     }
   }
@@ -93,23 +93,24 @@ class DatabaseHelper {
         )
       ''');
 
-      debugPrint('Database tables created successfully');
+      _log.info('Database tables created successfully');
     } catch (e) {
-      debugPrint('Error creating database tables: $e');
+      _log.severe('Error creating database tables', e);
       rethrow;
     }
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    debugPrint('Upgrading database from version $oldVersion to $newVersion');
+    _log.info('Upgrading database from $oldVersion to $newVersion');
     if (oldVersion < 2) {
-      // Add sync columns for existing databases
       try {
-        await db.execute('ALTER TABLE dive_sessions ADD COLUMN isSynced INTEGER DEFAULT 0');
-        await db.execute('ALTER TABLE dive_sessions ADD COLUMN lastSyncedAt TEXT');
+        await db.execute(
+            'ALTER TABLE dive_sessions ADD COLUMN isSynced INTEGER DEFAULT 0');
+        await db
+            .execute('ALTER TABLE dive_sessions ADD COLUMN lastSyncedAt TEXT');
       } catch (e) {
-        debugPrint('Error upgrading database to v2: $e');
-        // Ignore error if columns already exist
+        _log.warning(
+            'Error upgrading database to v2 (columns may already exist)', e);
       }
     }
   }
@@ -136,7 +137,7 @@ class DatabaseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      debugPrint('Error inserting dive session: $e');
+      _log.severe('Error inserting dive session', e);
       rethrow;
     }
   }
@@ -146,7 +147,7 @@ class DatabaseHelper {
       final db = await database;
       return db.query('dive_sessions', orderBy: 'createdAt DESC');
     } catch (e) {
-      debugPrint('Error retrieving dive sessions: $e');
+      _log.severe('Error retrieving dive sessions', e);
       rethrow;
     }
   }
@@ -161,7 +162,7 @@ class DatabaseHelper {
       );
       return result.isNotEmpty ? result.first : null;
     } catch (e) {
-      debugPrint('Error retrieving dive session: $e');
+      _log.severe('Error retrieving dive session', e);
       rethrow;
     }
   }
@@ -177,7 +178,7 @@ class DatabaseHelper {
         whereArgs: [sessionToUpdate['id']],
       );
     } catch (e) {
-      debugPrint('Error updating dive session: $e');
+      _log.severe('Error updating dive session', e);
       rethrow;
     }
   }
@@ -191,7 +192,7 @@ class DatabaseHelper {
         whereArgs: [id],
       );
     } catch (e) {
-      debugPrint('Error deleting dive session: $e');
+      _log.severe('Error deleting dive session', e);
       rethrow;
     }
   }
@@ -207,7 +208,7 @@ class DatabaseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      debugPrint('Error saving user profile: $e');
+      _log.severe('Error saving user profile', e);
       rethrow;
     }
   }
@@ -222,7 +223,7 @@ class DatabaseHelper {
       );
       return result.isNotEmpty ? result.first : null;
     } catch (e) {
-      debugPrint('Error retrieving user profile: $e');
+      _log.severe('Error retrieving user profile', e);
       rethrow;
     }
   }
@@ -232,9 +233,9 @@ class DatabaseHelper {
       final db = await database;
       await db.delete('dive_sessions');
       await db.delete('user_profiles');
-      debugPrint('All data cleared');
+      _log.info('All local data cleared');
     } catch (e) {
-      debugPrint('Error clearing database: $e');
+      _log.severe('Error clearing database', e);
       rethrow;
     }
   }

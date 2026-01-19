@@ -3,10 +3,11 @@ import 'package:divelogtest/services/storage_service.dart';
 import 'package:divelogtest/services/dive_service.dart';
 import 'package:divelogtest/services/firestore_user_service.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logging/logging.dart';
 
 class UserService {
+  static final Logger _log = Logger('UserService');
   static final UserService _instance = UserService._internal();
   factory UserService() => _instance;
   UserService._internal();
@@ -16,7 +17,6 @@ class UserService {
   final _firestoreUserService = FirestoreUserService();
   UserProfile? _currentUser;
   bool _isInitialized = false;
-  String? _currentUserId; // Track current user ID (Firebase UID or local)
 
   Future<void> initialize() async {
     if (_isInitialized) return;
@@ -27,36 +27,35 @@ class UserService {
   /// Initialize with Firebase user (called when user signs in)
   Future<void> initializeWithFirebaseUser(User firebaseUser) async {
     try {
-      _currentUserId = firebaseUser.uid;
-      debugPrint('Initializing with Firebase user: ${firebaseUser.uid}');
-      
-      // Try to load local profile first
-      var localProfile = await _storageService.loadUserProfile(firebaseUser.uid);
-      
+      _log.info('Initializing with Firebase user: ${firebaseUser.uid}');
+
+      final localProfile =
+          await _storageService.loadUserProfile(firebaseUser.uid);
       if (localProfile != null && localProfile.isNotEmpty) {
         _currentUser = UserProfile.fromJson(localProfile);
-        debugPrint('Loaded local profile for Firebase user: ${_currentUser!.name}');
+        _log.info('Loaded local profile for user: ${_currentUser!.name}');
       } else {
-        // Try to fetch from Firestore
-        var firestoreProfile = await _firestoreUserService.getUserProfile(firebaseUser.uid);
-        
-        if (firestoreProfile != null) {
-          _currentUser = firestoreProfile;
-          await _saveToStorage(); // Save to local storage
-          debugPrint('Fetched profile from Firestore: ${_currentUser!.name}');
-        } else {
-          // Create new profile for Firebase user
-          _currentUser = await _createFirebaseUserProfile(firebaseUser);
-          debugPrint('Created new profile for Firebase user: ${_currentUser!.name}');
-        }
+        await _fetchOrCreatedProfileFromCloud(firebaseUser);
       }
-      
       _isInitialized = true;
     } catch (e) {
-      debugPrint('Error initializing with Firebase user: $e');
-      // Fallback to local user if Firebase fails
+      _log.severe('Error initializing with Firebase user', e);
       await createDefaultUserIfNeeded();
       _isInitialized = true;
+    }
+  }
+
+  Future<void> _fetchOrCreatedProfileFromCloud(User firebaseUser) async {
+    final firestoreProfile =
+        await _firestoreUserService.getUserProfile(firebaseUser.uid);
+
+    if (firestoreProfile != null) {
+      _currentUser = firestoreProfile;
+      await _saveToStorage();
+      _log.info('Fetched profile from Firestore: ${_currentUser!.name}');
+    } else {
+      _currentUser = await _createFirebaseUserProfile(firebaseUser);
+      _log.info('Created new profile for Firebase user: ${_currentUser!.name}');
     }
   }
 
@@ -65,7 +64,9 @@ class UserService {
     final now = DateTime.now();
     _currentUser = UserProfile(
       id: firebaseUser.uid,
-      name: firebaseUser.displayName ?? firebaseUser.email?.split('@').first ?? 'Usuario',
+      name: firebaseUser.displayName ??
+          firebaseUser.email?.split('@').first ??
+          'Usuario',
       email: firebaseUser.email ?? '',
       certificationLevel: null,
       certificationNumber: null,
@@ -76,10 +77,10 @@ class UserService {
       createdAt: now,
       updatedAt: now,
     );
-    
+
     // Save to local storage
     await _saveToStorage();
-    
+
     // Try to save to Firestore (but don't fail if offline)
     try {
       await _firestoreUserService.createOrUpdateUserProfile(
@@ -88,27 +89,25 @@ class UserService {
         email: _currentUser!.email,
       );
     } catch (e) {
-      debugPrint('Could not save to Firestore (offline?): $e');
+      _log.warning('Could not save to Firestore (offline?)', e);
     }
-    
+
     return _currentUser!;
   }
 
   Future<void> _loadFromStorage() async {
     try {
-      // Try to load user profile from storage (offline-first)
-      // First try with a known ID, or create new if doesn't exist
-      var storedProfile = await _storageService.loadUserProfile('default-user');
-      
+      final storedProfile =
+          await _storageService.loadUserProfile('default-user');
       if (storedProfile != null && storedProfile.isNotEmpty) {
         _currentUser = UserProfile.fromJson(storedProfile);
-        debugPrint('User profile loaded from storage: ${_currentUser!.name}');
+        _log.info('User profile loaded from storage: ${_currentUser!.name}');
       } else {
-        debugPrint('No user profile found in storage');
+        _log.info('No user profile found in storage');
         _currentUser = null;
       }
     } catch (e) {
-      debugPrint('Error loading user profile from storage: $e');
+      _log.severe('Error loading user profile from storage', e);
       _currentUser = null;
     }
   }
@@ -116,11 +115,10 @@ class UserService {
   Future<void> _saveToStorage() async {
     if (_currentUser == null) return;
     try {
-      // Save profile data to storage
       await _storageService.saveUserProfile(_currentUser!.toJson());
-      debugPrint('User profile saved to storage');
+      _log.info('User profile saved to storage');
     } catch (e) {
-      debugPrint('Error saving user profile to storage: $e');
+      _log.severe('Error saving user profile to storage', e);
       rethrow;
     }
   }
@@ -133,7 +131,7 @@ class UserService {
     DateTime? certificationDate,
   }) async {
     await initialize();
-    
+
     final now = DateTime.now();
     _currentUser = UserProfile(
       id: _uuid.v4(),
@@ -148,16 +146,15 @@ class UserService {
       createdAt: now,
       updatedAt: now,
     );
-    
+
     await _saveToStorage();
     return _currentUser!;
   }
 
   Future<UserProfile?> getUserProfile() async {
     await initialize();
-    // If no user exists after initialization, create default user
     if (_currentUser == null) {
-      debugPrint('No user found, creating default user');
+      _log.info('No user found, creating default user');
       await createDefaultUserIfNeeded();
     }
     return _currentUser;
@@ -171,11 +168,11 @@ class UserService {
     DateTime? certificationDate,
   }) async {
     await initialize();
-    
+
     if (_currentUser == null) {
       throw Exception('No user profile found. Create a profile first.');
     }
-    
+
     _currentUser = _currentUser!.copyWith(
       name: name,
       email: email,
@@ -184,28 +181,28 @@ class UserService {
       certificationDate: certificationDate,
       updatedAt: DateTime.now(),
     );
-    
+
     await _saveToStorage();
     return _currentUser!;
   }
 
   Future<UserProfile> updateUserStatistics() async {
     await initialize();
-    
+
     if (_currentUser == null) {
       throw Exception('No user profile found. Create a profile first.');
     }
 
     final diveService = DiveService();
     final stats = await diveService.getStatistics(_currentUser!.id);
-    
+
     _currentUser = _currentUser!.copyWith(
       totalDives: stats['totalDives'] as int,
       totalBottomTime: stats['totalBottomTime'] as double,
       deepestDive: stats['deepestDive'] as double,
       updatedAt: DateTime.now(),
     );
-    
+
     await _saveToStorage();
     return _currentUser!;
   }
@@ -226,7 +223,7 @@ class UserService {
         updatedAt: now,
       );
       await _saveToStorage();
-      debugPrint('Default user profile created: ${_currentUser!.name}');
+      _log.info('Default user profile created: ${_currentUser!.name}');
     }
   }
 

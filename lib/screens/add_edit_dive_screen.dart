@@ -8,6 +8,7 @@ import 'package:divelogtest/services/export_service.dart';
 import 'package:divelogtest/theme.dart';
 import 'package:divelogtest/widgets/custom_text_field.dart';
 import 'package:divelogtest/utils/validators.dart';
+import 'package:logging/logging.dart';
 
 class AddEditDiveScreen extends StatefulWidget {
   final DiveSession? existingDive;
@@ -19,6 +20,7 @@ class AddEditDiveScreen extends StatefulWidget {
 }
 
 class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
+  static final Logger _log = Logger('AddEditDiveScreen');
   final _formKey = GlobalKey<FormState>();
   final _diveService = DiveService();
   final _userService = UserService();
@@ -175,59 +177,30 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
 
   Future<void> _saveDive() async {
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Por favor, completa todos los campos requeridos')),
-      );
+      _showErrorSnackBar('Por favor, completa todos los campos requeridos');
       return;
     }
 
     setState(() => _isLoading = true);
-
     try {
-      final user = await _userService.getUserProfile();
-      if (user == null) throw Exception('Usuario no encontrado');
+      final diveSession = await _createDiveSessionFromForm();
 
-      // Filter out empty diver names
-      final buzos =
-          _nombreBuzos.where((name) => name.trim().isNotEmpty).toList();
-      if (buzos.isEmpty) buzos.add('Sin nombre');
+      // Advanced safety validations
+      final timeError =
+          Validators.diveTime(diveSession.horaEntrada, diveSession.horaSalida);
+      if (timeError != null) {
+        _showErrorSnackBar(timeError);
+        setState(() => _isLoading = false);
+        return;
+      }
 
-      final diveSession = DiveSession(
-        id: _isEditing ? widget.existingDive!.id : '',
-        userId: user.id,
-        cliente: _clienteController.text,
-        operadoraBuceo: _operadoraController.text,
-        direccionOperadora: _direccionController.text,
-        lugarBuceo: _lugarBuceoController.text,
-        tipoBuceo: _tipoBuceoSeleccionado,
-        nombreBuzos: buzos,
-        supervisorBuceo: _supervisorController.text,
-        estadoMar: _estadoMarSeleccionado,
-        visibilidad: _parseDouble(_visibilidadController.text),
-        temperaturaSuperior: _parseDouble(_tempSuperiorController.text),
-        temperaturaAgua: _parseDouble(_tempAguaController.text),
-        corrienteAgua: _corrienteController.text,
-        tipoAgua: _tipoAguaSeleccionado,
-        horaEntrada: _horaEntrada,
-        maximaProfundidad: _parseDouble(_profundidadController.text),
-        tiempoIntervaloSuperficie: _parseDouble(_tiempoIntervalController.text),
-        tiempoFondo: _parseDouble(_tiempoFondoController.text),
-        inicioDescompresion: _inicioDescompresion,
-        descompresionCompleta: _descompresionCompleta,
-        tiempoTotalInmersion: _parseDouble(_tiempoTotalController.text),
-        horaSalida: _horaSalida,
-        descripcionTrabajo: _descripcionController.text,
-        descompresionUtilizada: _descompresionController.text,
-        enfermedadLesion: _enfermedadController.text.isEmpty
-            ? null
-            : _enfermedadController.text,
-        tiempoSupervisionAcumulado:
-            _parseDouble(_tiempoSupervisionController.text),
-        tiempoBuceoAcumulado: _parseDouble(_tiempoBuceoAcumController.text),
-        createdAt: _isEditing ? widget.existingDive!.createdAt : DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+      final intervalError =
+          Validators.surfaceInterval(diveSession.tiempoIntervaloSuperficie);
+      if (intervalError != null) {
+        _log.warning('Safety warning: $intervalError');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(intervalError)));
+      }
 
       if (_isEditing) {
         await _diveService.updateDiveSession(diveSession);
@@ -237,21 +210,72 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
 
       if (mounted) {
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  _isEditing ? 'Inmersión actualizada' : 'Inmersión guardada')),
-        );
+        _showSuccessSnackBar(
+            _isEditing ? 'Inmersión actualizada' : 'Inmersión guardada');
       }
     } catch (e, stackTrace) {
-      debugPrint('Error saving dive: $e\n$stackTrace');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+      _log.severe('Error saving dive', e, stackTrace);
+      _showErrorSnackBar('Error: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<DiveSession> _createDiveSessionFromForm() async {
+    final user = await _userService.getUserProfile();
+    if (user == null) throw Exception('Usuario no encontrado');
+
+    final buzos = _nombreBuzos.where((name) => name.trim().isNotEmpty).toList();
+    if (buzos.isEmpty) buzos.add('Sin nombre');
+
+    return DiveSession(
+      id: _isEditing ? widget.existingDive!.id : '',
+      userId: user.id,
+      cliente: _clienteController.text,
+      operadoraBuceo: _operadoraController.text,
+      direccionOperadora: _direccionController.text,
+      lugarBuceo: _lugarBuceoController.text,
+      tipoBuceo: _tipoBuceoSeleccionado,
+      nombreBuzos: buzos,
+      supervisorBuceo: _supervisorController.text,
+      estadoMar: _estadoMarSeleccionado,
+      visibilidad: _parseDouble(_visibilidadController.text),
+      temperaturaSuperior: _parseDouble(_tempSuperiorController.text),
+      temperaturaAgua: _parseDouble(_tempAguaController.text),
+      corrienteAgua: _corrienteController.text,
+      tipoAgua: _tipoAguaSeleccionado,
+      horaEntrada: _horaEntrada,
+      maximaProfundidad: _parseDouble(_profundidadController.text),
+      tiempoIntervaloSuperficie: _parseDouble(_tiempoIntervalController.text),
+      tiempoFondo: _parseDouble(_tiempoFondoController.text),
+      inicioDescompresion: _inicioDescompresion,
+      descompresionCompleta: _descompresionCompleta,
+      tiempoTotalInmersion: _parseDouble(_tiempoTotalController.text),
+      horaSalida: _horaSalida,
+      descripcionTrabajo: _descripcionController.text,
+      descompresionUtilizada: _descompresionController.text,
+      enfermedadLesion: _enfermedadController.text.isEmpty
+          ? null
+          : _enfermedadController.text,
+      tiempoSupervisionAcumulado:
+          _parseDouble(_tiempoSupervisionController.text),
+      tiempoBuceoAcumulado: _parseDouble(_tiempoBuceoAcumController.text),
+      createdAt: _isEditing ? widget.existingDive!.createdAt : DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  void _showSuccessSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -269,7 +293,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
               tooltip: 'Exportar',
               onSelected: (value) async {
                 if (widget.existingDive == null) return;
-                
+
                 setState(() => _isLoading = true);
                 try {
                   if (value == 'pdf') {
@@ -278,7 +302,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
                     await _exportService.exportDiveToCsv(widget.existingDive!);
                   }
                 } catch (e) {
-                   if (mounted) {
+                  if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error al exportar: $e')),
                     );

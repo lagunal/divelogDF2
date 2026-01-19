@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:divelogtest/models/dive_session.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 
 class FirestoreDiveService {
-  static final FirestoreDiveService _instance = FirestoreDiveService._internal();
+  static final Logger _log = Logger('FirestoreDiveService');
+  static final FirestoreDiveService _instance =
+      FirestoreDiveService._internal();
   factory FirestoreDiveService() => _instance;
   FirestoreDiveService._internal();
 
@@ -14,20 +16,21 @@ class FirestoreDiveService {
   CollectionReference<Map<String, dynamic>> get _divesCollection =>
       _firestore.collection('dive_sessions');
 
-  Future<DiveSession> createDiveSession(DiveSession session, String userId) async {
+  Future<DiveSession> createDiveSession(
+      DiveSession session, String userId) async {
     try {
       final newSession = session.copyWith(
         userId: userId,
         // Preserve original timestamps if syncing, otherwise update
-        createdAt: session.createdAt, 
+        createdAt: session.createdAt,
         updatedAt: DateTime.now(),
       );
 
       await _divesCollection.doc(newSession.id).set(newSession.toFirestore());
-      debugPrint('Dive session created in Firestore: ${newSession.id}');
+      _log.info('Dive session created in Firestore: ${newSession.id}');
       return newSession;
     } catch (e) {
-      debugPrint('Error creating dive session in Firestore: $e');
+      _log.severe('Error creating dive session in Firestore', e);
       rethrow;
     }
   }
@@ -44,7 +47,7 @@ class FirestoreDiveService {
           .map((doc) => DiveSession.fromFirestore(doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching dive sessions from Firestore: $e');
+      _log.severe('Error fetching dive sessions from Firestore', e);
       return [];
     }
   }
@@ -67,13 +70,13 @@ class FirestoreDiveService {
 
       final data = doc.data()!;
       if (data['userId'] != userId) {
-        debugPrint('User does not have access to this dive session');
+        _log.warning('User does not have access to this dive session');
         return null;
       }
 
       return DiveSession.fromFirestore(data);
     } catch (e) {
-      debugPrint('Error fetching dive session from Firestore: $e');
+      _log.severe('Error fetching dive session from Firestore', e);
       return null;
     }
   }
@@ -86,7 +89,8 @@ class FirestoreDiveService {
     try {
       final snapshot = await _divesCollection
           .where('userId', isEqualTo: userId)
-          .where('horaEntrada', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+          .where('horaEntrada',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(start))
           .where('horaEntrada', isLessThanOrEqualTo: Timestamp.fromDate(end))
           .orderBy('horaEntrada', descending: true)
           .limit(100)
@@ -96,7 +100,7 @@ class FirestoreDiveService {
           .map((doc) => DiveSession.fromFirestore(doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching dive sessions by date range from Firestore: $e');
+      _log.severe('Error fetching dive sessions by date range', e);
       return [];
     }
   }
@@ -117,7 +121,7 @@ class FirestoreDiveService {
           .map((doc) => DiveSession.fromFirestore(doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching dive sessions by location from Firestore: $e');
+      _log.severe('Error fetching dive sessions by location', e);
       return [];
     }
   }
@@ -138,23 +142,27 @@ class FirestoreDiveService {
           .map((doc) => DiveSession.fromFirestore(doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching dive sessions by operator from Firestore: $e');
+      _log.severe('Error fetching dive sessions by operator', e);
       return [];
     }
   }
 
-  Future<DiveSession> updateDiveSession(DiveSession session, String userId) async {
+  Future<DiveSession> updateDiveSession(
+      DiveSession session, String userId) async {
     try {
       if (session.userId != userId) {
-        throw Exception('User does not have permission to update this dive session');
+        throw Exception(
+            'User does not have permission to update this dive session');
       }
 
       final updatedSession = session.copyWith(updatedAt: DateTime.now());
-      await _divesCollection.doc(session.id).update(updatedSession.toFirestore());
-      debugPrint('Dive session updated in Firestore: ${session.id}');
+      await _divesCollection
+          .doc(session.id)
+          .update(updatedSession.toFirestore());
+      _log.info('Dive session updated in Firestore: ${session.id}');
       return updatedSession;
     } catch (e) {
-      debugPrint('Error updating dive session in Firestore: $e');
+      _log.severe('Error updating dive session in Firestore', e);
       rethrow;
     }
   }
@@ -168,13 +176,14 @@ class FirestoreDiveService {
 
       final data = doc.data()!;
       if (data['userId'] != userId) {
-        throw Exception('User does not have permission to delete this dive session');
+        throw Exception(
+            'User does not have permission to delete this dive session');
       }
 
       await _divesCollection.doc(id).delete();
-      debugPrint('Dive session deleted from Firestore: $id');
+      _log.info('Dive session deleted from Firestore: $id');
     } catch (e) {
-      debugPrint('Error deleting dive session from Firestore: $e');
+      _log.severe('Error deleting dive session from Firestore', e);
       rethrow;
     }
   }
@@ -200,15 +209,17 @@ class FirestoreDiveService {
       );
       final deepestDive = sessions.fold<double>(
         0.0,
-        (max, session) => session.maximaProfundidad > max ? session.maximaProfundidad : max,
+        (max, session) =>
+            session.maximaProfundidad > max ? session.maximaProfundidad : max,
       );
       final averageDepth = sessions.fold<double>(
-        0.0,
-        (sum, session) => sum + session.maximaProfundidad,
-      ) / totalDives;
+            0.0,
+            (total, session) => total + session.maximaProfundidad,
+          ) /
+          totalDives;
       final totalDiveTime = sessions.fold<double>(
         0.0,
-        (sum, session) => sum + session.tiempoTotalInmersion,
+        (total, session) => total + session.tiempoTotalInmersion,
       );
 
       return {
@@ -219,7 +230,7 @@ class FirestoreDiveService {
         'totalDiveTime': totalDiveTime,
       };
     } catch (e) {
-      debugPrint('Error calculating statistics from Firestore: $e');
+      _log.severe('Error calculating statistics from Firestore', e);
       return {
         'totalDives': 0,
         'totalBottomTime': 0.0,
@@ -237,7 +248,7 @@ class FirestoreDiveService {
       locations.sort();
       return locations;
     } catch (e) {
-      debugPrint('Error fetching unique locations from Firestore: $e');
+      _log.severe('Error fetching unique locations from Firestore', e);
       return [];
     }
   }
@@ -249,7 +260,7 @@ class FirestoreDiveService {
       operators.sort();
       return operators;
     } catch (e) {
-      debugPrint('Error fetching unique operators from Firestore: $e');
+      _log.severe('Error fetching unique operators from Firestore', e);
       return [];
     }
   }

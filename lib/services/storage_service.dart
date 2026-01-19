@@ -1,10 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'package:divelogtest/services/database_helper.dart' if (dart.library.html) 'package:divelogtest/services/database_helper_stub.dart';
+import 'package:divelogtest/services/database_helper.dart'
+    if (dart.library.html) 'package:divelogtest/services/database_helper_stub.dart';
+import 'package:logging/logging.dart';
 
 // Import web storage conditionally
-import 'storage_service_web.dart' if (dart.library.html) 'storage_service_web.dart' as web_storage;
+import 'storage_service_web.dart'
+    if (dart.library.html) 'storage_service_web.dart' as web_storage;
 
 class StorageService {
+  static final Logger _log = Logger('StorageService');
   final _dbHelper = kIsWeb ? null : DatabaseHelper();
   final _webStorage = kIsWeb ? web_storage.WebStorageService() : null;
 
@@ -24,9 +28,9 @@ class StorageService {
         // For SQLite, efficient single update/insert
         await _dbHelper!.insertDiveSession(session);
       }
-      debugPrint('Single dive session saved');
+      _log.info('Single dive session saved');
     } catch (e) {
-      debugPrint('Error saving dive session: $e');
+      _log.severe('Error saving dive session', e);
       rethrow;
     }
   }
@@ -40,9 +44,9 @@ class StorageService {
           await _dbHelper!.insertDiveSession(session);
         }
       }
-      debugPrint('${sessions.length} dive sessions saved');
+      _log.info('${sessions.length} dive sessions saved');
     } catch (e) {
-      debugPrint('Error saving dive sessions: $e');
+      _log.severe('Error saving dive sessions', e);
       rethrow;
     }
   }
@@ -55,7 +59,7 @@ class StorageService {
         return await _dbHelper!.getAllDiveSessions();
       }
     } catch (e) {
-      debugPrint('Error loading dive sessions: $e');
+      _log.severe('Error loading dive sessions', e);
       return [];
     }
   }
@@ -67,9 +71,9 @@ class StorageService {
       } else {
         await _dbHelper!.saveUserProfile(profile);
       }
-      debugPrint('User profile saved');
+      _log.info('User profile saved');
     } catch (e) {
-      debugPrint('Error saving user profile: $e');
+      _log.severe('Error saving user profile', e);
       rethrow;
     }
   }
@@ -82,7 +86,7 @@ class StorageService {
         return await _dbHelper!.getUserProfile(userId);
       }
     } catch (e) {
-      debugPrint('Error loading user profile: $e');
+      _log.severe('Error loading user profile', e);
       return null;
     }
   }
@@ -94,9 +98,9 @@ class StorageService {
       } else {
         await _dbHelper!.clearAll();
       }
-      debugPrint('All storage cleared');
+      _log.info('All storage cleared');
     } catch (e) {
-      debugPrint('Error clearing storage: $e');
+      _log.severe('Error clearing storage', e);
       rethrow;
     }
   }

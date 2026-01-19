@@ -4,6 +4,7 @@ import 'package:divelogtest/models/user_profile.dart';
 import 'package:divelogtest/services/user_service.dart';
 import 'package:divelogtest/auth/firebase_auth_manager.dart';
 import 'package:divelogtest/theme.dart';
+import 'package:logging/logging.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserService? userService;
@@ -20,6 +21,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  static final Logger _log = Logger('ProfileScreen');
   late final UserService _userService;
   late final FirebaseAuthManager _authManager;
   UserProfile? _userProfile;
@@ -47,11 +49,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _showEditProfileDialog() {
     if (_userProfile == null) return;
-    
+
     final nameController = TextEditingController(text: _userProfile!.name);
     final emailController = TextEditingController(text: _userProfile!.email);
-    final certLevelController = TextEditingController(text: _userProfile!.certificationLevel);
-    final certNumberController = TextEditingController(text: _userProfile!.certificationNumber);
+    final certLevelController =
+        TextEditingController(text: _userProfile!.certificationLevel);
+    final certNumberController =
+        TextEditingController(text: _userProfile!.certificationNumber);
 
     showDialog(
       context: context,
@@ -71,15 +75,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: const InputDecoration(labelText: 'Email'),
                 enabled: false,
               ),
-               const SizedBox(height: 8),
+              const SizedBox(height: 8),
               TextField(
                 controller: certLevelController,
-                decoration: const InputDecoration(labelText: 'Nivel Certificación'),
+                decoration:
+                    const InputDecoration(labelText: 'Nivel Certificación'),
               ),
-               const SizedBox(height: 8),
+              const SizedBox(height: 8),
               TextField(
                 controller: certNumberController,
-                decoration: const InputDecoration(labelText: 'Número Certificación'),
+                decoration:
+                    const InputDecoration(labelText: 'Número Certificación'),
               ),
             ],
           ),
@@ -116,7 +122,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       applicationLegalese: '© 2025 Dive Log App',
       children: [
         const SizedBox(height: 16),
-        const Text('Una aplicación profesional para registrar y gestionar tus inmersiones de buceo.'),
+        const Text(
+            'Una aplicación profesional para registrar y gestionar tus inmersiones de buceo.'),
       ],
     );
   }
@@ -128,12 +135,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _authManager = widget.authManager ?? FirebaseAuthManager();
     _currentFirebaseUser = FirebaseAuth.instance.currentUser;
     _loadUserProfile();
-    
+
     // Listen to auth state changes to refresh profile when user changes
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (mounted && user != null && user.uid != _currentFirebaseUser?.uid) {
         _currentFirebaseUser = user;
-        debugPrint('Auth state changed, reloading profile for: ${user.uid}');
+        _log.info('Auth state changed, reloading profile for: ${user.uid}');
         _loadUserProfile();
       }
     });
@@ -202,8 +209,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               child: Center(
                                 child: Text(
-                                  _userProfile?.name.substring(0, 1).toUpperCase() ?? 'D',
-                                  style: theme.textTheme.displayMedium?.copyWith(
+                                  _userProfile?.name
+                                          .substring(0, 1)
+                                          .toUpperCase() ??
+                                      'D',
+                                  style:
+                                      theme.textTheme.displayMedium?.copyWith(
                                     color: colorScheme.primary,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -288,7 +299,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _InfoCard(
                               icon: Icons.badge,
                               label: 'Certificación',
-                              value: _userProfile?.certificationLevel ?? 'No especificada',
+                              value: _userProfile?.certificationLevel ??
+                                  'No especificada',
                             ),
                           ],
                         ),
@@ -521,7 +533,9 @@ class _SettingsItem extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: isDestructive ? colorScheme.error : colorScheme.onSurfaceVariant,
+              color: isDestructive
+                  ? colorScheme.error
+                  : colorScheme.onSurfaceVariant,
               size: 24,
             ),
             const SizedBox(width: 16),
@@ -529,7 +543,8 @@ class _SettingsItem extends StatelessWidget {
               child: Text(
                 title,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: isDestructive ? colorScheme.error : colorScheme.onSurface,
+                  color:
+                      isDestructive ? colorScheme.error : colorScheme.onSurface,
                 ),
               ),
             ),

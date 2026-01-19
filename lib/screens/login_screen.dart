@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:divelogtest/auth/firebase_auth_manager.dart';
 import 'package:divelogtest/services/firestore_user_service.dart';
+import 'package:logging/logging.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,6 +11,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  static final Logger _log = Logger('LoginScreen');
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -37,11 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null && mounted) {
-        // Successful login - navigation will be handled by auth state change
-        debugPrint('User logged in: ${user.uid}');
+        _log.info('User logged in: ${user.uid}');
       }
     } catch (e) {
-      debugPrint('Login error: $e');
+      _log.severe('Login error', e);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -59,39 +60,39 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null) {
-        // Create user profile in Firestore
         await _userService.createOrUpdateUserProfile(
           userId: user.uid,
           name: user.email?.split('@').first ?? 'Usuario',
           email: user.email ?? '',
         );
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Cuenta creada exitosamente')),
-          );
-        }
+        _showSuccessSnackbar('Cuenta creada exitosamente');
       }
     } catch (e) {
-      debugPrint('Registration error: $e');
+      _log.severe('Registration error', e);
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSuccessSnackbar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     }
   }
 
   Future<void> _handleForgotPassword() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor ingresa tu correo electrónico')),
-      );
+      _showSuccessSnackbar('Por favor ingresa tu correo electrónico');
       return;
     }
 
     try {
       await _authManager.resetPassword(email: email, context: context);
     } catch (e) {
-      debugPrint('Reset password error: $e');
+      _log.severe('Reset password error', e);
     }
   }
 
@@ -126,10 +127,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 16),
                     Text(
                       'Registro de Buceo',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                     ),
                     const SizedBox(height: 48),
                     Card(
@@ -143,9 +145,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             Text(
                               '¿Ya tienes cuenta? Inicia sesión.\n¿Nuevo? Ingresa tu correo y crea una cuenta.',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 16),
@@ -176,9 +181,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 prefixIcon: const Icon(Icons.lock),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                    _obscurePassword
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
                                   ),
-                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                  onPressed: () => setState(() =>
+                                      _obscurePassword = !_obscurePassword),
                                 ),
                                 border: const OutlineInputBorder(),
                               ),
@@ -196,7 +204,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                onPressed: _isLoading ? null : _handleForgotPassword,
+                                onPressed:
+                                    _isLoading ? null : _handleForgotPassword,
                                 child: const Text('¿Olvidaste tu contraseña?'),
                               ),
                             ),

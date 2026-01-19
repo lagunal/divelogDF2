@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:divelogtest/auth/auth_manager.dart';
+import 'package:logging/logging.dart';
 
 class FirebaseAuthManager extends AuthManager with EmailSignInManager {
+  static final Logger _log = Logger('FirebaseAuthManager');
   final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
 
   @override
@@ -24,38 +26,47 @@ class FirebaseAuthManager extends AuthManager with EmailSignInManager {
       );
       return credential.user;
     } on firebase_auth.FirebaseAuthException catch (e) {
-      debugPrint('Firebase sign in error: ${e.code} - ${e.message}');
-      String errorMessage;
-      switch (e.code) {
-        case 'user-not-found':
-          errorMessage = 'No se encontró una cuenta con este correo';
-          break;
-        case 'wrong-password':
-          errorMessage = 'Contraseña incorrecta';
-          break;
-        case 'invalid-email':
-          errorMessage = 'Correo electrónico inválido';
-          break;
-        case 'user-disabled':
-          errorMessage = 'Esta cuenta ha sido deshabilitada';
-          break;
-        default:
-          errorMessage = 'Error al iniciar sesión: ${e.message}';
-      }
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
+      _handleAuthError(context, e, 'sign in');
       return null;
     } catch (e) {
-      debugPrint('Unexpected sign in error: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error inesperado al iniciar sesión')),
-        );
-      }
+      _log.severe('Unexpected sign in error', e);
+      _showSnackbar(context, 'Error inesperado al iniciar sesión');
       return null;
+    }
+  }
+
+  void _handleAuthError(
+      BuildContext context, firebase_auth.FirebaseAuthException e, String op) {
+    _log.warning('Firebase $op error: ${e.code} - ${e.message}');
+    final errorMessage = _getFriendlyErrorMessage(e.code);
+    _showSnackbar(context, errorMessage);
+  }
+
+  void _showSnackbar(BuildContext context, String message) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  String _getFriendlyErrorMessage(String code) {
+    switch (code) {
+      case 'user-not-found':
+        return 'No se encontró una cuenta con este correo';
+      case 'wrong-password':
+        return 'Contraseña incorrecta';
+      case 'invalid-email':
+        return 'Correo electrónico inválido';
+      case 'user-disabled':
+        return 'Esta cuenta ha sido deshabilitada';
+      case 'email-already-in-use':
+        return 'Este correo ya está registrado';
+      case 'weak-password':
+        return 'La contraseña debe tener al menos 6 caracteres';
+      case 'operation-not-allowed':
+        return 'Operación no permitida';
+      default:
+        return 'Ha ocurrido un error de autenticación';
     }
   }
 
@@ -72,37 +83,11 @@ class FirebaseAuthManager extends AuthManager with EmailSignInManager {
       );
       return credential.user;
     } on firebase_auth.FirebaseAuthException catch (e) {
-      debugPrint('Firebase registration error: ${e.code} - ${e.message}');
-      String errorMessage;
-      switch (e.code) {
-        case 'email-already-in-use':
-          errorMessage = 'Este correo ya está registrado';
-          break;
-        case 'invalid-email':
-          errorMessage = 'Correo electrónico inválido';
-          break;
-        case 'weak-password':
-          errorMessage = 'La contraseña debe tener al menos 6 caracteres';
-          break;
-        case 'operation-not-allowed':
-          errorMessage = 'El registro con correo no está habilitado';
-          break;
-        default:
-          errorMessage = 'Error al crear cuenta: ${e.message}';
-      }
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
+      _handleAuthError(context, e, 'registration');
       return null;
     } catch (e) {
-      debugPrint('Unexpected registration error: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error inesperado al crear cuenta')),
-        );
-      }
+      _log.severe('Unexpected registration error', e);
+      _showSnackbar(context, 'Error inesperado al crear cuenta');
       return null;
     }
   }
@@ -112,7 +97,7 @@ class FirebaseAuthManager extends AuthManager with EmailSignInManager {
     try {
       await _auth.signOut();
     } catch (e) {
-      debugPrint('Sign out error: $e');
+      _log.severe('Sign out error', e);
       rethrow;
     }
   }
@@ -121,31 +106,14 @@ class FirebaseAuthManager extends AuthManager with EmailSignInManager {
   Future deleteUser(BuildContext context) async {
     try {
       final user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('No hay usuario autenticado');
-      }
+      if (user == null) throw Exception('No hay usuario autenticado');
       await user.delete();
     } on firebase_auth.FirebaseAuthException catch (e) {
-      debugPrint('Delete user error: ${e.code} - ${e.message}');
-      String errorMessage;
-      if (e.code == 'requires-recent-login') {
-        errorMessage = 'Debes iniciar sesión nuevamente para eliminar tu cuenta';
-      } else {
-        errorMessage = 'Error al eliminar cuenta: ${e.message}';
-      }
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
+      _handleAuthError(context, e, 'delete user');
       rethrow;
     } catch (e) {
-      debugPrint('Unexpected delete user error: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error inesperado al eliminar cuenta')),
-        );
-      }
+      _log.severe('Unexpected delete user error', e);
+      _showSnackbar(context, 'Error inesperado al eliminar cuenta');
       rethrow;
     }
   }
@@ -157,42 +125,15 @@ class FirebaseAuthManager extends AuthManager with EmailSignInManager {
   }) async {
     try {
       final user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('No hay usuario autenticado');
-      }
+      if (user == null) throw Exception('No hay usuario autenticado');
       await user.verifyBeforeUpdateEmail(email);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Se ha enviado un correo de verificación'),
-          ),
-        );
-      }
+      _showSnackbar(context, 'Se ha enviado un correo de verificación');
     } on firebase_auth.FirebaseAuthException catch (e) {
-      debugPrint('Update email error: ${e.code} - ${e.message}');
-      String errorMessage;
-      if (e.code == 'requires-recent-login') {
-        errorMessage = 'Debes iniciar sesión nuevamente para cambiar tu correo';
-      } else if (e.code == 'email-already-in-use') {
-        errorMessage = 'Este correo ya está en uso';
-      } else if (e.code == 'invalid-email') {
-        errorMessage = 'Correo electrónico inválido';
-      } else {
-        errorMessage = 'Error al actualizar correo: ${e.message}';
-      }
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
+      _handleAuthError(context, e, 'update email');
       rethrow;
     } catch (e) {
-      debugPrint('Unexpected update email error: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error inesperado al actualizar correo')),
-        );
-      }
+      _log.severe('Unexpected update email error', e);
+      _showSnackbar(context, 'Error inesperado al actualizar correo');
       rethrow;
     }
   }
@@ -204,36 +145,14 @@ class FirebaseAuthManager extends AuthManager with EmailSignInManager {
   }) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Se ha enviado un correo para restablecer tu contraseña'),
-          ),
-        );
-      }
+      _showSnackbar(
+          context, 'Se ha enviado un correo para restablecer tu contraseña');
     } on firebase_auth.FirebaseAuthException catch (e) {
-      debugPrint('Reset password error: ${e.code} - ${e.message}');
-      String errorMessage;
-      if (e.code == 'user-not-found') {
-        errorMessage = 'No se encontró una cuenta con este correo';
-      } else if (e.code == 'invalid-email') {
-        errorMessage = 'Correo electrónico inválido';
-      } else {
-        errorMessage = 'Error al enviar correo: ${e.message}';
-      }
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
+      _handleAuthError(context, e, 'reset password');
       rethrow;
     } catch (e) {
-      debugPrint('Unexpected reset password error: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error inesperado al enviar correo')),
-        );
-      }
+      _log.severe('Unexpected reset password error', e);
+      _showSnackbar(context, 'Error inesperado al enviar correo');
       rethrow;
     }
   }

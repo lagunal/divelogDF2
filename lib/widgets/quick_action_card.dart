@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:divelogtest/theme.dart';
 
 class QuickActionCard extends StatelessWidget {
   final IconData icon;
@@ -17,34 +18,44 @@ class QuickActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(
+            vertical: AppSpacing.lg,
+            horizontal: AppSpacing.md,
+          ),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: isDark ? 0.2 : 0.1),
-            borderRadius: BorderRadius.circular(16),
+            color: isDark ? colorScheme.surface : Colors.white,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            boxShadow: [AppEffects.softShadow],
             border: Border.all(
-              color: color.withValues(alpha: 0.3),
+              color: color.withValues(alpha: 0.1),
               width: 1,
             ),
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 32, color: color),
-              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 32, color: color),
+              ),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: theme.textTheme.labelLarge?.semiBold.withColor(color),
               ),
             ],
           ),

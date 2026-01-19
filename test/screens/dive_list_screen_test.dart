@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:divelogtest/screens/dive_list_screen.dart';
 import 'package:divelogtest/models/dive_session.dart';
 import 'package:divelogtest/services/dive_service.dart';
+import 'package:divelogtest/widgets/dive_card.dart';
 
 // Mock DiveService
 class MockDiveService implements DiveService {
@@ -41,19 +42,41 @@ class MockDiveService implements DiveService {
   }
 
   @override
-  Future<DiveSession> createDiveSession(DiveSession session) async { throw UnimplementedError(); }
+  Future<DiveSession> createDiveSession(DiveSession session) async {
+    throw UnimplementedError();
+  }
+
   @override
-  Future<void> deleteDiveSession(String id, String userId) async { throw UnimplementedError(); }
+  Future<void> deleteDiveSession(String id, String userId) async {
+    throw UnimplementedError();
+  }
+
   @override
-  Future<DiveSession?> getDiveSessionById(String id) async { throw UnimplementedError(); }
+  Future<DiveSession?> getDiveSessionById(String id) async {
+    throw UnimplementedError();
+  }
+
   @override
-  Future<List<DiveSession>> getDiveSessionsByDateRange(DateTime start, DateTime end) async { throw UnimplementedError(); }
+  Future<List<DiveSession>> getDiveSessionsByDateRange(
+      DateTime start, DateTime end) async {
+    throw UnimplementedError();
+  }
+
   @override
-  Future<List<DiveSession>> getDiveSessionsByLocation(String location) async { throw UnimplementedError(); }
+  Future<List<DiveSession>> getDiveSessionsByLocation(String location) async {
+    throw UnimplementedError();
+  }
+
   @override
-  Future<List<DiveSession>> getDiveSessionsByOperator(String operator) async { throw UnimplementedError(); }
+  Future<List<DiveSession>> getDiveSessionsByOperator(String operator) async {
+    throw UnimplementedError();
+  }
+
   @override
-  Future<Map<String, dynamic>> getStatistics(String userId) async { throw UnimplementedError(); }
+  Future<Map<String, dynamic>> getStatistics(String userId) async {
+    throw UnimplementedError();
+  }
+
   @override
   bool get isOnline => true;
   @override
@@ -65,7 +88,12 @@ class MockDiveService implements DiveService {
   @override
   Future<void> syncPendingDives() async {}
   @override
-  Future<DiveSession> updateDiveSession(DiveSession session) async { throw UnimplementedError(); }
+  Future<DiveSession> updateDiveSession(DiveSession session) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> syncFromFirestore(String userId) async {}
   @override
   void dispose() {}
 }
@@ -87,15 +115,16 @@ void main() {
     );
 
     // Initial loading
-    await tester.pump(); 
+    await tester.pump();
     // Data loaded
-    await tester.pump(Duration.zero); 
+    await tester.pump(Duration.zero);
 
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(find.text('No hay inmersiones registradas'), findsOneWidget);
   });
 
-  testWidgets('has search field and filter button', (WidgetTester tester) async {
+  testWidgets('has search field and filter button',
+      (WidgetTester tester) async {
     mockDiveService.setSessions([]);
 
     await tester.pumpWidget(
@@ -125,7 +154,8 @@ void main() {
     expect(find.text('Cozumel'), findsOneWidget);
   });
 
-  testWidgets('filter button opens filter bottom sheet', (WidgetTester tester) async {
+  testWidgets('filter button opens filter bottom sheet',
+      (WidgetTester tester) async {
     mockDiveService.setSessions([
       DiveSession(
         id: '1',
@@ -135,6 +165,7 @@ void main() {
         horaEntrada: DateTime.now(),
         horaSalida: DateTime.now().add(const Duration(minutes: 45)),
         maximaProfundidad: 20,
+        tiempoIntervaloSuperficie: 0,
         tiempoFondo: 45,
         tiempoTotalInmersion: 50,
         cliente: 'Test',
@@ -182,6 +213,7 @@ void main() {
         horaEntrada: DateTime.now(),
         horaSalida: DateTime.now().add(const Duration(minutes: 45)),
         maximaProfundidad: 20,
+        tiempoIntervaloSuperficie: 0,
         tiempoFondo: 45,
         tiempoTotalInmersion: 50,
         cliente: 'Test',
@@ -210,14 +242,34 @@ void main() {
       ),
     );
 
+    // Initial pump to trigger initState and start _loadDives
+    await tester.pump();
+
+    // Process async gaps in _loadDives
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // Final settlement including any state transitions
     await tester.pumpAndSettle();
 
-    expect(find.text('Fecha'), findsOneWidget); // Default sort label
-    
-    // Open filter sheet to see options
-    await tester.tap(find.text('Fecha'));
+    // Diagnostic check for loading state
+    if (find.byType(CircularProgressIndicator).evaluate().isNotEmpty) {
+      fail('Still loading after 100ms and pumpAndSettle');
+    }
+
+    // Diagnostic check for empty state
+    if (find.text('No hay inmersiones registradas').evaluate().isNotEmpty) {
+      fail('Empty state shown - data not loaded');
+    }
+
+    // Verify data is loaded
+    expect(find.byType(DiveCard), findsOneWidget);
+
+    // Opening filter/sort sheet (calls _showFilterSheet)
+    final sortButton = find.byIcon(Icons.sort);
+    expect(sortButton, findsOneWidget);
+    await tester.tap(sortButton);
     await tester.pumpAndSettle();
-    
+
     expect(find.text('Ordenar por'), findsOneWidget);
   });
 
@@ -236,7 +288,8 @@ void main() {
     expect(fab, findsOneWidget);
   });
 
-  testWidgets('clear filters button appears when filters are active', (WidgetTester tester) async {
+  testWidgets('clear filters button appears when filters are active',
+      (WidgetTester tester) async {
     mockDiveService.setSessions([]);
 
     await tester.pumpWidget(

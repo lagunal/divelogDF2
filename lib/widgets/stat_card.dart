@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:divelogtest/theme.dart';
 
 class StatCard extends StatelessWidget {
   final IconData icon;
@@ -21,35 +22,45 @@ class StatCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: isDark ? 0.2 : 0.1),
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? colorScheme.surface : Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        boxShadow: [AppEffects.softShadow],
         border: Border.all(
-          color: color.withValues(alpha: 0.3),
+          color: color.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, size: 24, color: color),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.xs),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
+            child: Icon(icon, size: 20, color: color),
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(height: AppSpacing.sm),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: theme.textTheme.headlineSmall?.semiBold,
+              ),
+              Text(
+                label,
+                style: theme.textTheme.labelSmall?.withColor(
+                  colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ],
       ),

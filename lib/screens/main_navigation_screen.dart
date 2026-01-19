@@ -9,6 +9,7 @@ import 'package:divelogtest/providers/dive_provider.dart';
 import 'package:divelogtest/services/user_service.dart';
 import 'package:divelogtest/models/user_profile.dart';
 import 'package:divelogtest/widgets/sync_status_indicator.dart';
+import 'package:logging/logging.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -18,8 +19,10 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
+  static final Logger _log = Logger('MainNavigationScreen');
   int _currentIndex = 0;
-  final UserService _userService = UserService(); // Now using unified UserService
+  final UserService _userService =
+      UserService(); // Now using unified UserService
   UserProfile? _userProfile;
   bool _isInitialized = false;
 
@@ -37,49 +40,44 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Future<void> _initializeApp() async {
-    debugPrint('=== MainNavigationScreen: Starting app initialization ===');
+    _log.info('Starting app initialization');
     final user = FirebaseAuth.instance.currentUser;
-    
-    try {
-      // Initialize UserService with Firebase user (if logged in)
-      if (user != null) {
-        debugPrint('Initializing with Firebase user: ${user.uid}');
-        await _userService.initializeWithFirebaseUser(user);
-        debugPrint('✓ UserService initialized with Firebase user');
-      } else {
-        debugPrint('Initializing with local user (offline mode)');
-        await _userService.initialize();
-        debugPrint('✓ UserService initialized with local user');
-      }
 
-      // Get user profile (now guaranteed to exist)
-      debugPrint('Fetching user profile...');
+    try {
+      await _initializeUserService(user);
       final profile = await _userService.getUserProfile();
-      debugPrint('✓ User profile loaded: ${profile?.name} (${profile?.id})');
-      
-      // Initialize DiveProvider with current user ID
-      debugPrint('Initializing DiveProvider...');
-      final provider = Provider.of<DiveProvider>(context, listen: false);
-      await provider.initialize(profile!.id);
-      debugPrint('✓ DiveProvider initialized');
+      if (profile == null) throw Exception('Profile not found');
+
+      _log.info('User profile loaded: ${profile.name} (${profile.id})');
+      await _initializeDiveProvider(profile.id);
 
       if (mounted) {
         setState(() {
           _userProfile = profile;
           _isInitialized = true;
         });
-        debugPrint('=== MainNavigationScreen: Initialization complete ===');
+        _log.info('Initialization complete');
       }
     } catch (e, stackTrace) {
-      debugPrint('❌ Error initializing app: $e');
-      debugPrint('Stack trace: $stackTrace');
-      // Set initialized to true anyway to prevent infinite loading
-      if (mounted) {
-        setState(() {
-          _isInitialized = true;
-        });
-      }
+      _log.severe('Error initializing app', e, stackTrace);
+      if (mounted) setState(() => _isInitialized = true);
     }
+  }
+
+  Future<void> _initializeUserService(User? user) async {
+    if (user != null) {
+      _log.info('Initializing with Firebase user: ${user.uid}');
+      await _userService.initializeWithFirebaseUser(user);
+    } else {
+      _log.info('Initializing with local user');
+      await _userService.initialize();
+    }
+  }
+
+  Future<void> _initializeDiveProvider(String userId) async {
+    _log.info('Initializing DiveProvider');
+    final provider = Provider.of<DiveProvider>(context, listen: false);
+    await provider.initialize(userId);
   }
 
   @override
@@ -440,7 +438,8 @@ class _DrawerItem extends StatelessWidget {
                     color: isSelected
                         ? colorScheme.primary
                         : colorScheme.onSurface,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
               ),

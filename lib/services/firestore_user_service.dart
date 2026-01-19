@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:divelogtest/models/user_profile.dart';
 import 'package:divelogtest/services/firestore_dive_service.dart';
-import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 
 class FirestoreUserService {
-  static final FirestoreUserService _instance = FirestoreUserService._internal();
+  static final Logger _log = Logger('FirestoreUserService');
+  static final FirestoreUserService _instance =
+      FirestoreUserService._internal();
   factory FirestoreUserService() => _instance;
   FirestoreUserService._internal();
 
@@ -23,57 +25,75 @@ class FirestoreUserService {
     DateTime? certificationDate,
   }) async {
     try {
-      final now = DateTime.now();
       final doc = await _usersCollection.doc(userId).get();
-
-      UserProfile profile;
-      if (doc.exists) {
-        // Update existing profile
-        final existing = UserProfile.fromFirestore(doc.data()!);
-        profile = existing.copyWith(
-          name: name,
-          email: email,
-          certificationLevel: certificationLevel ?? existing.certificationLevel,
-          certificationNumber: certificationNumber ?? existing.certificationNumber,
-          certificationDate: certificationDate ?? existing.certificationDate,
-          updatedAt: now,
-        );
-      } else {
-        // Create new profile
-        profile = UserProfile(
-          id: userId,
-          name: name,
-          email: email,
-          certificationLevel: certificationLevel,
-          certificationNumber: certificationNumber,
-          certificationDate: certificationDate,
-          totalDives: 0,
-          totalBottomTime: 0.0,
-          deepestDive: 0.0,
-          createdAt: now,
-          updatedAt: now,
-        );
-      }
+      final profile = doc.exists
+          ? _updateExistingProfile(doc, name, email, certificationLevel,
+              certificationNumber, certificationDate)
+          : _createNewProfile(userId, name, email, certificationLevel,
+              certificationNumber, certificationDate);
 
       await _usersCollection.doc(userId).set(profile.toFirestore());
-      debugPrint('User profile saved to Firestore: $userId');
+      _log.info('User profile saved to Firestore: $userId');
       return profile;
     } catch (e) {
-      debugPrint('Error saving user profile to Firestore: $e');
+      _log.severe('Error saving user profile to Firestore', e);
       rethrow;
     }
+  }
+
+  UserProfile _updateExistingProfile(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+    String name,
+    String email,
+    String? certLevel,
+    String? certNum,
+    DateTime? certDate,
+  ) {
+    final existing = UserProfile.fromFirestore(doc.data()!);
+    return existing.copyWith(
+      name: name,
+      email: email,
+      certificationLevel: certLevel ?? existing.certificationLevel,
+      certificationNumber: certNum ?? existing.certificationNumber,
+      certificationDate: certDate ?? existing.certificationDate,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  UserProfile _createNewProfile(
+    String userId,
+    String name,
+    String email,
+    String? certLevel,
+    String? certNum,
+    DateTime? certDate,
+  ) {
+    final now = DateTime.now();
+    return UserProfile(
+      id: userId,
+      name: name,
+      email: email,
+      certificationLevel: certLevel,
+      certificationNumber: certNum,
+      certificationDate: certDate,
+      totalDives: 0,
+      totalBottomTime: 0.0,
+      deepestDive: 0.0,
+      createdAt: now,
+      updatedAt: now,
+    );
   }
 
   Future<UserProfile?> getUserProfile(String userId) async {
     try {
       final doc = await _usersCollection.doc(userId).get();
       if (!doc.exists) {
-        debugPrint('User profile not found in Firestore: $userId');
+        _log.info('User profile not found in Firestore: $userId');
         return null;
       }
       return UserProfile.fromFirestore(doc.data()!);
     } catch (e) {
-      debugPrint('Error fetching user profile from Firestore: $e');
+      _log.severe('Error fetching user profile from Firestore', e);
       return null;
     }
   }
@@ -102,10 +122,10 @@ class FirestoreUserService {
       );
 
       await _usersCollection.doc(userId).update(updatedProfile.toFirestore());
-      debugPrint('User statistics updated in Firestore: $userId');
+      _log.info('User statistics updated in Firestore: $userId');
       return updatedProfile;
     } catch (e) {
-      debugPrint('Error updating user statistics in Firestore: $e');
+      _log.severe('Error updating user statistics in Firestore', e);
       rethrow;
     }
   }
@@ -113,9 +133,9 @@ class FirestoreUserService {
   Future<void> deleteUserProfile(String userId) async {
     try {
       await _usersCollection.doc(userId).delete();
-      debugPrint('User profile deleted from Firestore: $userId');
+      _log.info('User profile deleted from Firestore: $userId');
     } catch (e) {
-      debugPrint('Error deleting user profile from Firestore: $e');
+      _log.severe('Error deleting user profile from Firestore', e);
       rethrow;
     }
   }

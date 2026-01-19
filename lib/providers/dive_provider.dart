@@ -3,11 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:divelogtest/models/dive_session.dart';
 import 'package:divelogtest/services/dive_service.dart';
+import 'package:logging/logging.dart';
 
 class DiveProvider extends ChangeNotifier {
+  static final Logger _log = Logger('DiveProvider');
   final DiveService _diveService = DiveService();
   StreamSubscription<SyncStatus>? _syncStatusSubscription;
-  
+
   List<DiveSession> _allDives = [];
   Map<String, dynamic> _statistics = {};
   bool _isLoading = false;
@@ -28,45 +30,47 @@ class DiveProvider extends ChangeNotifier {
 
   Future<void> initialize(String userId) async {
     if (_isInitialized) {
-      debugPrint('DiveProvider already initialized for user: $userId');
+      _log.info('DiveProvider already initialized for user: $userId');
       return;
     }
-    
-    debugPrint('Initializing DiveProvider for user: $userId');
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+
+    _log.info('Initializing DiveProvider for user: $userId');
+    _setLoading(true);
 
     try {
+      await _diveService.syncFromFirestore(userId);
       await _loadAllData(userId);
       _isInitialized = true;
-      debugPrint('DiveProvider initialized successfully. Total dives: ${_allDives.length}');
-      
-      // Attempt background sync once on initialization
+      _setupSyncListener();
+      _log.info('DiveProvider initialized. Total dives: ${_allDives.length}');
+      // Background sync
       _diveService.syncPendingDives();
-      
-      // Listen to sync status changes
-      _syncStatusSubscription = _diveService.syncStatusStream.listen((status) {
-        _syncStatus = status;
-        debugPrint('Sync status changed: $status');
-        notifyListeners();
-        
-        // Refresh data after successful sync
-        if (status == SyncStatus.completed) {
-          final userId = FirebaseAuth.instance.currentUser?.uid;
-          if (userId != null) {
-            refreshData(userId);
-          }
-        }
-      });
     } catch (e) {
       _error = 'Error al inicializar: $e';
-      debugPrint('Error initializing DiveProvider: $e');
+      _log.severe('Error initializing DiveProvider', e);
     } finally {
-      _isLoading = false;
-      notifyListeners();
-      debugPrint('DiveProvider initialization complete. Loading: $_isLoading, Error: $_error');
+      _setLoading(false);
     }
+  }
+
+  void _setupSyncListener() {
+    _syncStatusSubscription?.cancel();
+    _syncStatusSubscription = _diveService.syncStatusStream.listen((status) {
+      _syncStatus = status;
+      _log.info('Sync status changed: $status');
+      notifyListeners();
+
+      if (status == SyncStatus.completed) {
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) refreshData(userId);
+      }
+    });
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    if (!value) _error = null;
+    notifyListeners();
   }
 
   Future<void> _loadAllData(String userId) async {
@@ -74,24 +78,20 @@ class DiveProvider extends ChangeNotifier {
       _allDives = await _diveService.getDiveSessionsByUserId(userId);
       _statistics = await _diveService.getStatistics(userId);
     } catch (e) {
-      debugPrint('Error loading dive data: $e');
+      _log.severe('Error loading dive data', e);
       rethrow;
     }
   }
 
   Future<void> refreshData(String userId) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
+    _setLoading(true);
     try {
       await _loadAllData(userId);
     } catch (e) {
       _error = 'Error al actualizar datos: $e';
-      debugPrint('Error refreshing data: $e');
+      _log.severe('Error refreshing data', e);
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
@@ -110,11 +110,10 @@ class DiveProvider extends ChangeNotifier {
       await _updateStatistics(userId);
     } catch (e) {
       _error = 'Error al crear inmersión: $e';
-      debugPrint('Error creating dive: $e');
+      _log.severe('Error creating dive', e);
       rethrow;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
@@ -137,11 +136,10 @@ class DiveProvider extends ChangeNotifier {
       await _updateStatistics(userId);
     } catch (e) {
       _error = 'Error al actualizar inmersión: $e';
-      debugPrint('Error updating dive: $e');
+      _log.severe('Error updating dive', e);
       rethrow;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
@@ -156,11 +154,10 @@ class DiveProvider extends ChangeNotifier {
       await _updateStatistics(userId);
     } catch (e) {
       _error = 'Error al eliminar inmersión: $e';
-      debugPrint('Error deleting dive: $e');
+      _log.severe('Error deleting dive', e);
       rethrow;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
@@ -168,7 +165,7 @@ class DiveProvider extends ChangeNotifier {
     try {
       _statistics = await _diveService.getStatistics(userId);
     } catch (e) {
-      debugPrint('Error updating statistics: $e');
+      _log.warning('Error updating statistics', e);
     }
   }
 
@@ -191,18 +188,18 @@ class DiveProvider extends ChangeNotifier {
       return null;
     }
   }
-  
+
   Future<void> manualSync() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
-    
+
     try {
       await _diveService.syncPendingDives();
     } catch (e) {
-      debugPrint('Error during manual sync: $e');
+      _log.severe('Error during manual sync', e);
     }
   }
-  
+
   @override
   void dispose() {
     _syncStatusSubscription?.cancel();

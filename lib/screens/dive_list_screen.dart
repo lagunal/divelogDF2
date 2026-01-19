@@ -24,7 +24,7 @@ class _DiveListScreenState extends State<DiveListScreen> {
   List<DiveSession> _allDives = [];
   List<DiveSession> _filteredDives = [];
   bool _isLoading = true;
-  
+
   // Filter & Sort states
   String _searchQuery = '';
   String? _selectedLocation;
@@ -43,17 +43,28 @@ class _DiveListScreenState extends State<DiveListScreen> {
     setState(() => _isLoading = true);
     try {
       await _diveService.initialize();
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      final dives = userId != null 
+      final userId = _getUserId();
+      final dives = userId != null
           ? await _diveService.getDiveSessionsByUserId(userId)
-          : await _diveService.getAllDiveSessions(); // Fallback if no user
+          : await _diveService.getAllDiveSessions();
       setState(() {
         _allDives = dives;
         _filteredDives = dives;
         _isLoading = false;
       });
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  String? _getUserId() {
+    try {
+      return FirebaseAuth.instance.currentUser?.uid;
+    } catch (_) {
+      // Return a dummy ID for tests where Firebase is not initialized
+      return 'test-user';
     }
   }
 
@@ -76,14 +87,16 @@ class _DiveListScreenState extends State<DiveListScreen> {
         }
 
         // Operator filter
-        if (_selectedOperator != null && dive.operadoraBuceo != _selectedOperator) {
+        if (_selectedOperator != null &&
+            dive.operadoraBuceo != _selectedOperator) {
           return false;
         }
 
         // Date range filter
         if (_dateRange != null) {
           if (dive.horaEntrada.isBefore(_dateRange!.start) ||
-              dive.horaEntrada.isAfter(_dateRange!.end.add(const Duration(days: 1)))) {
+              dive.horaEntrada
+                  .isAfter(_dateRange!.end.add(const Duration(days: 1)))) {
             return false;
           }
         }
@@ -118,9 +131,9 @@ class _DiveListScreenState extends State<DiveListScreen> {
   }
 
   Future<void> _showFilterSheet() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
+    final userId = _getUserId();
     if (userId == null) return;
-    
+
     final locations = await _diveService.getUniqueLocations(userId);
     final operators = await _diveService.getUniqueOperators(userId);
 
@@ -161,10 +174,13 @@ class _DiveListScreenState extends State<DiveListScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Todas las Inmersiones', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text('Todas las Inmersiones',
+            style: theme.textTheme.titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold)),
         actions: [
           if (_filteredDives.isNotEmpty && !_isLoading)
             PopupMenuButton<String>(
@@ -179,9 +195,9 @@ class _DiveListScreenState extends State<DiveListScreen> {
                     await _exportService.exportDivesListToCsv(_filteredDives);
                   }
                 } catch (e) {
-                   if (mounted) {
+                  if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error al exportar: $e')),
+                      SnackBar(content: Text('Error al exportar: $value - $e')),
                     );
                   }
                 } finally {
@@ -216,7 +232,8 @@ class _DiveListScreenState extends State<DiveListScreen> {
             onPressed: () async {
               final result = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddEditDiveScreen()),
+                MaterialPageRoute(
+                    builder: (context) => const AddEditDiveScreen()),
               );
               if (result == true) _loadDives();
             },
@@ -239,21 +256,48 @@ class _DiveListScreenState extends State<DiveListScreen> {
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      onChanged: (value) {
-                        _searchQuery = value;
-                        _applyFilters();
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Buscar inmersiones...',
-                        prefixIcon: Icon(Icons.search, color: colorScheme.primary),
-                        filled: true,
-                        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.lg),
-                          borderSide: BorderSide.none,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [AppEffects.softShadow],
+                      ),
+                      child: TextField(
+                        onChanged: (value) {
+                          _searchQuery = value;
+                          _applyFilters();
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Buscar inmersiones...',
+                          hintStyle: theme.textTheme.bodyMedium?.withColor(
+                            colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                          ),
+                          prefixIcon:
+                              Icon(Icons.search, color: colorScheme.primary),
+                          filled: true,
+                          fillColor:
+                              isDark ? colorScheme.surface : Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            borderSide: BorderSide(
+                              color: colorScheme.outline.withValues(alpha: 0.1),
+                              width: 1,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            borderSide: BorderSide(
+                              color: colorScheme.outline.withValues(alpha: 0.1),
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            borderSide: BorderSide(
+                              color: colorScheme.primary.withValues(alpha: 0.3),
+                              width: 1.5,
+                            ),
+                          ),
+                          contentPadding: AppSpacing.horizontalMd,
                         ),
-                        contentPadding: AppSpacing.horizontalMd,
                       ),
                     ),
                   ),
@@ -262,13 +306,22 @@ class _DiveListScreenState extends State<DiveListScreen> {
                     decoration: BoxDecoration(
                       color: _hasActiveFilters
                           ? colorScheme.primaryContainer
-                          : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                          : (isDark ? colorScheme.surface : Colors.white),
                       borderRadius: BorderRadius.circular(AppRadius.lg),
+                      boxShadow: [AppEffects.softShadow],
+                      border: Border.all(
+                        color: _hasActiveFilters
+                            ? colorScheme.primary
+                            : colorScheme.outline.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
                     ),
                     child: IconButton(
                       icon: Icon(
                         Icons.tune,
-                        color: _hasActiveFilters ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
+                        color: _hasActiveFilters
+                            ? colorScheme.onPrimaryContainer
+                            : colorScheme.primary,
                       ),
                       onPressed: _showFilterSheet,
                       tooltip: 'Filtros',
@@ -349,21 +402,29 @@ class _DiveListScreenState extends State<DiveListScreen> {
                   : _filteredDives.isEmpty
                       ? Center(
                           child: EmptyStateCard(
-                            icon: _hasActiveFilters ? Icons.search_off : Icons.scuba_diving,
+                            icon: _hasActiveFilters
+                                ? Icons.search_off
+                                : Icons.scuba_diving,
                             title: _hasActiveFilters
                                 ? 'No se encontraron inmersiones'
                                 : 'No hay inmersiones registradas',
                             subtitle: _hasActiveFilters
                                 ? 'Intenta con otros filtros'
                                 : 'Registra tu primera inmersión para comenzar',
-                            actionLabel: _hasActiveFilters ? 'Limpiar filtros' : 'Agregar Inmersión',
-                            onAction: _hasActiveFilters ? _clearFilters : () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AddEditDiveScreen()),
-                              );
-                              if (result == true) _loadDives();
-                            },
+                            actionLabel: _hasActiveFilters
+                                ? 'Limpiar filtros'
+                                : 'Agregar Inmersión',
+                            onAction: _hasActiveFilters
+                                ? _clearFilters
+                                : () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AddEditDiveScreen()),
+                                    );
+                                    if (result == true) _loadDives();
+                                  },
                           ),
                         )
                       : RefreshIndicator(
@@ -371,7 +432,8 @@ class _DiveListScreenState extends State<DiveListScreen> {
                           child: ListView.separated(
                             padding: AppSpacing.paddingMd,
                             itemCount: _filteredDives.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 12),
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 12),
                             itemBuilder: (context, index) {
                               final dive = _filteredDives[index];
                               return DiveCard(
@@ -380,7 +442,8 @@ class _DiveListScreenState extends State<DiveListScreen> {
                                   final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => AddEditDiveScreen(existingDive: dive),
+                                      builder: (context) =>
+                                          AddEditDiveScreen(existingDive: dive),
                                     ),
                                   );
                                   if (result == true) _loadDives();
@@ -424,7 +487,7 @@ class FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Container(
       margin: const EdgeInsets.only(right: 8),
       child: Material(
@@ -452,7 +515,8 @@ class FilterChip extends StatelessWidget {
                   child: label,
                 ),
                 const SizedBox(width: 6),
-                Icon(Icons.close, size: 16, color: colorScheme.onSecondaryContainer),
+                Icon(Icons.close,
+                    size: 16, color: colorScheme.onSecondaryContainer),
               ],
             ),
           ),
@@ -529,7 +593,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -543,7 +608,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Filtros y Orden', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                    Text('Filtros y Orden',
+                        style: theme.textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold)),
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.pop(context),
@@ -553,7 +620,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 const SizedBox(height: 24),
 
                 // Sort By Section
-                Text('Ordenar por', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text('Ordenar por',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -561,27 +630,34 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     ChoiceChip(
                       label: const Text('Fecha'),
                       selected: _sortBy == 'date',
-                      onSelected: (selected) => setState(() => _sortBy = 'date'),
+                      onSelected: (selected) =>
+                          setState(() => _sortBy = 'date'),
                     ),
                     ChoiceChip(
                       label: const Text('Profundidad'),
                       selected: _sortBy == 'depth',
-                      onSelected: (selected) => setState(() => _sortBy = 'depth'),
+                      onSelected: (selected) =>
+                          setState(() => _sortBy = 'depth'),
                     ),
                     ChoiceChip(
                       label: const Text('Duración'),
                       selected: _sortBy == 'duration',
-                      onSelected: (selected) => setState(() => _sortBy = 'duration'),
+                      onSelected: (selected) =>
+                          setState(() => _sortBy = 'duration'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
 
                 // Location Filter
-                Text('Lugar de buceo', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text('Lugar de buceo',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 12),
                 if (widget.locations.isEmpty)
-                  Text('No hay ubicaciones disponibles', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant))
+                  Text('No hay ubicaciones disponibles',
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: colorScheme.onSurfaceVariant))
                 else
                   Wrap(
                     spacing: 8,
@@ -589,17 +665,22 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                       return ChoiceChip(
                         label: Text(location),
                         selected: _location == location,
-                        onSelected: (selected) => setState(() => _location = selected ? location : null),
+                        onSelected: (selected) => setState(
+                            () => _location = selected ? location : null),
                       );
                     }).toList(),
                   ),
                 const SizedBox(height: 24),
 
                 // Operator Filter
-                Text('Operadora', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text('Operadora',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 12),
                 if (widget.operators.isEmpty)
-                  Text('No hay operadoras disponibles', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant))
+                  Text('No hay operadoras disponibles',
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: colorScheme.onSurfaceVariant))
                 else
                   Wrap(
                     spacing: 8,
@@ -607,14 +688,17 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                       return ChoiceChip(
                         label: Text(operator),
                         selected: _operator == operator,
-                        onSelected: (selected) => setState(() => _operator = selected ? operator : null),
+                        onSelected: (selected) => setState(
+                            () => _operator = selected ? operator : null),
                       );
                     }).toList(),
                   ),
                 const SizedBox(height: 24),
 
                 // Date Range Filter
-                Text('Rango de fechas', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                Text('Rango de fechas',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.date_range),
@@ -637,7 +721,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: () => widget.onApply(_location, _operator, _dateRange, _sortBy),
+                    onPressed: () => widget.onApply(
+                        _location, _operator, _dateRange, _sortBy),
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
                       child: Text('Aplicar Filtros'),

@@ -74,26 +74,56 @@ extension TextStyleExtensions on TextStyle {
   TextStyle withSize(double size) => copyWith(fontSize: size);
 }
 
+/// Glassmorphism and modern UI effects
+class AppEffects {
+  static BoxShadow softShadow = BoxShadow(
+    color: Colors.black.withValues(alpha: 0.05),
+    blurRadius: 15,
+    offset: const Offset(0, 5),
+  );
+
+  static BoxDecoration glassDecoration({
+    required Color color,
+    double blur = 10.0,
+    double opacity = 0.1,
+    double borderRadius = 16.0,
+  }) {
+    return BoxDecoration(
+      color: color.withValues(alpha: opacity),
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: Colors.white.withValues(alpha: 0.2),
+        width: 1.5,
+      ),
+    );
+  }
+}
+
 // =============================================================================
 // COLORS
 // =============================================================================
 
 /// Ocean/diving themed color palette for light mode
-/// Uses blues and teals inspired by underwater environments
 class LightModeColors {
-  // Primary: Deep ocean blue
-  static const lightPrimary = Color(0xFF006B95);
+  static const deepOcean = Color(0xFF001E30);
+  static const surfaceBlue = Color(0xFF006B95);
+  static const turquoise = Color(0xFF00B4D8);
+  static const tropicalWater = Color(0xFF90E0EF);
+  static const seaFoam = Color(0xFFCAF0F8);
+
+  // Primary: Professional Navy
+  static const lightPrimary = Color(0xFF023E8A);
   static const lightOnPrimary = Color(0xFFFFFFFF);
   static const lightPrimaryContainer = Color(0xFFCAE6FF);
   static const lightOnPrimaryContainer = Color(0xFF001E30);
 
-  // Secondary: Teal/turquoise accent
-  static const lightSecondary = Color(0xFF00897B);
+  // Secondary: Vibrant Turquoise
+  static const lightSecondary = Color(0xFF0077B6);
   static const lightOnSecondary = Color(0xFFFFFFFF);
 
-  // Tertiary: Coral accent
-  static const lightTertiary = Color(0xFF7D5260);
-  static const lightOnTertiary = Color(0xFFFFFFFF);
+  // Tertiary: Coral/Sandy Accent
+  static const lightTertiary = Color(0xFFE9C46A);
+  static const lightOnTertiary = Color(0xFF264653);
 
   // Error colors
   static const lightError = Color(0xFFBA1A1A);
@@ -101,10 +131,10 @@ class LightModeColors {
   static const lightErrorContainer = Color(0xFFFFDAD6);
   static const lightOnErrorContainer = Color(0xFF410002);
 
-  // Surface and background: Light aqua tint
-  static const lightSurface = Color(0xFFFCFCFF);
+  // Surface and background: Clean with light aqua tint
+  static const lightSurface = Color(0xFFFBFCFF);
   static const lightOnSurface = Color(0xFF1A1C1E);
-  static const lightBackground = Color(0xFFF7FAFB);
+  static const lightBackground = Color(0xFFF0F4F8);
   static const lightSurfaceVariant = Color(0xFFDDE3EA);
   static const lightOnSurfaceVariant = Color(0xFF41484D);
 
@@ -112,23 +142,40 @@ class LightModeColors {
   static const lightOutline = Color(0xFF71787E);
   static const lightShadow = Color(0xFF000000);
   static const lightInversePrimary = Color(0xFF8DCFFF);
+
+  // Gradients
+  static const oceanGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [lightPrimary, lightSecondary],
+  );
+
+  static const tropicalGradient = LinearGradient(
+    begin: Alignment.topRight,
+    end: Alignment.bottomLeft,
+    colors: [turquoise, tropicalWater],
+  );
 }
 
-/// Dark mode colors with ocean theme
+/// Dark mode colors with deep ocean theme
 class DarkModeColors {
-  // Primary: Bright cyan for dark background
-  static const darkPrimary = Color(0xFF8DCFFF);
-  static const darkOnPrimary = Color(0xFF003549);
-  static const darkPrimaryContainer = Color(0xFF004D69);
-  static const darkOnPrimaryContainer = Color(0xFFCAE6FF);
+  static const abyssalBlack = Color(0xFF000814);
+  static const midnightBlue = Color(0xFF001D3D);
+  static const deepOceanBlue = Color(0xFF003566);
 
-  // Secondary: Bright teal
-  static const darkSecondary = Color(0xFF4DB6AC);
-  static const darkOnSecondary = Color(0xFF00332D);
+  // Primary: Electric Cyan
+  static const darkPrimary = Color(0xFF00B4D8);
+  static const darkOnPrimary = Color(0xFF000814);
+  static const darkPrimaryContainer = Color(0xFF003566);
+  static const darkOnPrimaryContainer = Color(0xFFCAF0F8);
 
-  // Tertiary: Soft coral
-  static const darkTertiary = Color(0xFFEFB8C8);
-  static const darkOnTertiary = Color(0xFF492532);
+  // Secondary: Soft Aqua
+  static const darkSecondary = Color(0xFF90E0EF);
+  static const darkOnSecondary = Color(0xFF003566);
+
+  // Tertiary: Muted Coral
+  static const darkTertiary = Color(0xFFF4A261);
+  static const darkOnTertiary = Color(0xFF264653);
 
   // Error colors
   static const darkError = Color(0xFFFFB4AB);
@@ -136,8 +183,8 @@ class DarkModeColors {
   static const darkErrorContainer = Color(0xFF93000A);
   static const darkOnErrorContainer = Color(0xFFFFDAD6);
 
-  // Surface and background: Deep ocean dark
-  static const darkSurface = Color(0xFF0E1416);
+  // Surface and background: Abyssal theme
+  static const darkSurface = Color(0xFF000814);
   static const darkOnSurface = Color(0xFFE1E2E5);
   static const darkSurfaceVariant = Color(0xFF41484D);
   static const darkOnSurfaceVariant = Color(0xFFC1C7CE);
@@ -146,6 +193,13 @@ class DarkModeColors {
   static const darkOutline = Color(0xFF8B9297);
   static const darkShadow = Color(0xFF000000);
   static const darkInversePrimary = Color(0xFF006B95);
+
+  // Gradients
+  static const abyssalGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [midnightBlue, abyssalBlack],
+  );
 }
 
 /// Font size constants
@@ -173,93 +227,93 @@ class FontSizes {
 
 /// Light theme with modern, neutral aesthetic
 ThemeData get lightTheme => ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.light(
-    primary: LightModeColors.lightPrimary,
-    onPrimary: LightModeColors.lightOnPrimary,
-    primaryContainer: LightModeColors.lightPrimaryContainer,
-    onPrimaryContainer: LightModeColors.lightOnPrimaryContainer,
-    secondary: LightModeColors.lightSecondary,
-    onSecondary: LightModeColors.lightOnSecondary,
-    tertiary: LightModeColors.lightTertiary,
-    onTertiary: LightModeColors.lightOnTertiary,
-    error: LightModeColors.lightError,
-    onError: LightModeColors.lightOnError,
-    errorContainer: LightModeColors.lightErrorContainer,
-    onErrorContainer: LightModeColors.lightOnErrorContainer,
-    surface: LightModeColors.lightSurface,
-    onSurface: LightModeColors.lightOnSurface,
-    surfaceContainerHighest: LightModeColors.lightSurfaceVariant,
-    onSurfaceVariant: LightModeColors.lightOnSurfaceVariant,
-    outline: LightModeColors.lightOutline,
-    shadow: LightModeColors.lightShadow,
-    inversePrimary: LightModeColors.lightInversePrimary,
-  ),
-  brightness: Brightness.light,
-  scaffoldBackgroundColor: LightModeColors.lightBackground,
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Colors.transparent,
-    foregroundColor: LightModeColors.lightOnSurface,
-    elevation: 0,
-    scrolledUnderElevation: 0,
-  ),
-  cardTheme: CardThemeData(
-    elevation: 0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-      side: BorderSide(
-        color: LightModeColors.lightOutline.withOpacity(0.2),
-        width: 1,
+      useMaterial3: true,
+      colorScheme: ColorScheme.light(
+        primary: LightModeColors.lightPrimary,
+        onPrimary: LightModeColors.lightOnPrimary,
+        primaryContainer: LightModeColors.lightPrimaryContainer,
+        onPrimaryContainer: LightModeColors.lightOnPrimaryContainer,
+        secondary: LightModeColors.lightSecondary,
+        onSecondary: LightModeColors.lightOnSecondary,
+        tertiary: LightModeColors.lightTertiary,
+        onTertiary: LightModeColors.lightOnTertiary,
+        error: LightModeColors.lightError,
+        onError: LightModeColors.lightOnError,
+        errorContainer: LightModeColors.lightErrorContainer,
+        onErrorContainer: LightModeColors.lightOnErrorContainer,
+        surface: LightModeColors.lightSurface,
+        onSurface: LightModeColors.lightOnSurface,
+        surfaceContainerHighest: LightModeColors.lightSurfaceVariant,
+        onSurfaceVariant: LightModeColors.lightOnSurfaceVariant,
+        outline: LightModeColors.lightOutline,
+        shadow: LightModeColors.lightShadow,
+        inversePrimary: LightModeColors.lightInversePrimary,
       ),
-    ),
-  ),
-  textTheme: _buildTextTheme(Brightness.light),
-);
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: LightModeColors.lightBackground,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        foregroundColor: LightModeColors.lightOnSurface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: LightModeColors.lightOutline.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+      ),
+      textTheme: _buildTextTheme(Brightness.light),
+    );
 
 /// Dark theme with good contrast and readability
 ThemeData get darkTheme => ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.dark(
-    primary: DarkModeColors.darkPrimary,
-    onPrimary: DarkModeColors.darkOnPrimary,
-    primaryContainer: DarkModeColors.darkPrimaryContainer,
-    onPrimaryContainer: DarkModeColors.darkOnPrimaryContainer,
-    secondary: DarkModeColors.darkSecondary,
-    onSecondary: DarkModeColors.darkOnSecondary,
-    tertiary: DarkModeColors.darkTertiary,
-    onTertiary: DarkModeColors.darkOnTertiary,
-    error: DarkModeColors.darkError,
-    onError: DarkModeColors.darkOnError,
-    errorContainer: DarkModeColors.darkErrorContainer,
-    onErrorContainer: DarkModeColors.darkOnErrorContainer,
-    surface: DarkModeColors.darkSurface,
-    onSurface: DarkModeColors.darkOnSurface,
-    surfaceContainerHighest: DarkModeColors.darkSurfaceVariant,
-    onSurfaceVariant: DarkModeColors.darkOnSurfaceVariant,
-    outline: DarkModeColors.darkOutline,
-    shadow: DarkModeColors.darkShadow,
-    inversePrimary: DarkModeColors.darkInversePrimary,
-  ),
-  brightness: Brightness.dark,
-  scaffoldBackgroundColor: DarkModeColors.darkSurface,
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Colors.transparent,
-    foregroundColor: DarkModeColors.darkOnSurface,
-    elevation: 0,
-    scrolledUnderElevation: 0,
-  ),
-  cardTheme: CardThemeData(
-    elevation: 0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-      side: BorderSide(
-        color: DarkModeColors.darkOutline.withOpacity(0.2),
-        width: 1,
+      useMaterial3: true,
+      colorScheme: ColorScheme.dark(
+        primary: DarkModeColors.darkPrimary,
+        onPrimary: DarkModeColors.darkOnPrimary,
+        primaryContainer: DarkModeColors.darkPrimaryContainer,
+        onPrimaryContainer: DarkModeColors.darkOnPrimaryContainer,
+        secondary: DarkModeColors.darkSecondary,
+        onSecondary: DarkModeColors.darkOnSecondary,
+        tertiary: DarkModeColors.darkTertiary,
+        onTertiary: DarkModeColors.darkOnTertiary,
+        error: DarkModeColors.darkError,
+        onError: DarkModeColors.darkOnError,
+        errorContainer: DarkModeColors.darkErrorContainer,
+        onErrorContainer: DarkModeColors.darkOnErrorContainer,
+        surface: DarkModeColors.darkSurface,
+        onSurface: DarkModeColors.darkOnSurface,
+        surfaceContainerHighest: DarkModeColors.darkSurfaceVariant,
+        onSurfaceVariant: DarkModeColors.darkOnSurfaceVariant,
+        outline: DarkModeColors.darkOutline,
+        shadow: DarkModeColors.darkShadow,
+        inversePrimary: DarkModeColors.darkInversePrimary,
       ),
-    ),
-  ),
-  textTheme: _buildTextTheme(Brightness.dark),
-);
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: DarkModeColors.darkSurface,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        foregroundColor: DarkModeColors.darkOnSurface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: DarkModeColors.darkOutline.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+      ),
+      textTheme: _buildTextTheme(Brightness.dark),
+    );
 
 /// Build text theme using Inter font family
 TextTheme _buildTextTheme(Brightness brightness) {

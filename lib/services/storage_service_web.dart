@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logging/logging.dart';
 
 /// Web-only storage service using SharedPreferences for persistence
 class WebStorageService {
+  static final Logger _log = Logger('WebStorageService');
   static final WebStorageService _instance = WebStorageService._internal();
   static const String _divesKey = 'dive_sessions';
   static const String _userProfileKeyPrefix = 'user_profile_';
@@ -20,9 +21,9 @@ class WebStorageService {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = jsonEncode(sessions);
       await prefs.setString(_divesKey, jsonString);
-      debugPrint('${sessions.length} dive sessions saved to SharedPreferences');
+      _log.info('${sessions.length} dive sessions saved to SharedPreferences');
     } catch (e) {
-      debugPrint('Error saving dive sessions: $e');
+      _log.severe('Error saving dive sessions', e);
       rethrow;
     }
   }
@@ -31,7 +32,7 @@ class WebStorageService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_divesKey);
-      
+
       if (jsonString == null || jsonString.isEmpty) return [];
 
       final List<dynamic> decoded = jsonDecode(jsonString);
@@ -39,7 +40,7 @@ class WebStorageService {
         decoded.map((item) => item as Map<String, dynamic>),
       );
     } catch (e) {
-      debugPrint('Error loading dive sessions: $e');
+      _log.severe('Error loading dive sessions', e);
       return [];
     }
   }
@@ -48,19 +49,19 @@ class WebStorageService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = profile['id'] as String?;
-      
+
       if (userId == null) {
-        debugPrint('Cannot save user profile without userId');
+        _log.warning('Cannot save user profile without userId');
         return;
       }
-      
+
       final userKey = '$_userProfileKeyPrefix$userId';
       final jsonString = jsonEncode(profile);
       await prefs.setString(userKey, jsonString);
-      await prefs.setString(_currentUserIdKey, userId); // Track current user
-      debugPrint('User profile saved to SharedPreferences with key: $userKey');
+      await prefs.setString(_currentUserIdKey, userId);
+      _log.info('User profile saved to SharedPreferences: $userKey');
     } catch (e) {
-      debugPrint('Error saving user profile: $e');
+      _log.severe('Error saving user profile', e);
       rethrow;
     }
   }
@@ -70,21 +71,21 @@ class WebStorageService {
       final prefs = await SharedPreferences.getInstance();
       final userKey = '$_userProfileKeyPrefix$userId';
       final jsonString = prefs.getString(userKey);
-      
+
       if (jsonString == null || jsonString.isEmpty) {
-        debugPrint('No profile found for userId: $userId');
+        _log.info('No profile found for userId: $userId');
         return null;
       }
 
       final decoded = jsonDecode(jsonString);
       if (decoded is Map<String, dynamic>) {
-        debugPrint('Loaded profile for userId: $userId');
+        _log.info('Loaded profile for userId: $userId');
         return decoded;
       }
 
       return null;
     } catch (e) {
-      debugPrint('Error loading user profile: $e');
+      _log.severe('Error loading user profile', e);
       return null;
     }
   }
@@ -93,9 +94,9 @@ class WebStorageService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-      debugPrint('All SharedPreferences cleared');
+      _log.info('All SharedPreferences cleared');
     } catch (e) {
-      debugPrint('Error clearing storage: $e');
+      _log.severe('Error clearing storage', e);
       rethrow;
     }
   }
