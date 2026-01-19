@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('shows validation SnackBar when required fields are empty', (tester) async {
+  testWidgets('shows validation SnackBar when required fields are empty',
+      (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: lightTheme,
@@ -16,7 +17,7 @@ void main() {
     final saveFinder = find.byIcon(Icons.check);
     expect(saveFinder, findsOneWidget);
     await tester.tap(saveFinder);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     // Expect a SnackBar with validation message
     expect(find.textContaining('Por favor, completa'), findsOneWidget);
@@ -35,9 +36,10 @@ void main() {
 
     // Add a diver
     // Scroll down to ensure button is visible
-    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -300));
+    await tester.drag(
+        find.byType(SingleChildScrollView), const Offset(0, -300));
     await tester.pumpAndSettle();
-    
+
     await tester.tap(find.text('Agregar'));
     await tester.pumpAndSettle();
 

@@ -40,7 +40,7 @@ void main() {
       );
     });
 
-    testWidgets('displays dive location and operator', (WidgetTester tester) async {
+    testWidgets('displays dive location', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: testTheme,
@@ -55,12 +55,10 @@ void main() {
 
       // Verify location is shown
       expect(find.text('Cozumel'), findsOneWidget);
-      
-      // Verify operator is shown
-      expect(find.text('Test Operator'), findsOneWidget);
     });
 
-    testWidgets('displays dive statistics (depth, time, temperature)', (WidgetTester tester) async {
+    testWidgets('displays dive statistics (depth, time, water type)',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: testTheme,
@@ -75,12 +73,12 @@ void main() {
 
       // Verify depth is shown
       expect(find.text('25.5m'), findsOneWidget);
-      
+
       // Verify time is shown
       expect(find.text('45min'), findsOneWidget);
-      
-      // Verify temperature is shown
-      expect(find.text('25°C'), findsOneWidget);
+
+      // Verify water type is shown
+      expect(find.text('Salada'), findsOneWidget);
     });
 
     testWidgets('has location icon', (WidgetTester tester) async {
@@ -96,14 +94,15 @@ void main() {
         ),
       );
 
-      // Verify location icon exists
-      expect(find.byIcon(Icons.location_on), findsOneWidget);
-      
-      // Verify chevron icon exists (indicates card is tappable)
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+      // Verify scuba diving icon exists in header
+      expect(find.byIcon(Icons.scuba_diving), findsOneWidget);
+
+      // Verify arrow forward icon exists (indicates card is tappable)
+      expect(find.byIcon(Icons.arrow_forward_ios), findsOneWidget);
     });
 
-    testWidgets('triggers onTap callback when tapped', (WidgetTester tester) async {
+    testWidgets('triggers onTap callback when tapped',
+        (WidgetTester tester) async {
       bool tapped = false;
 
       await tester.pumpWidget(
@@ -126,7 +125,8 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('renders correctly in light theme', (WidgetTester tester) async {
+    testWidgets('renders correctly in light theme',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: testTheme,
@@ -164,22 +164,26 @@ void main() {
       // Verify card renders without errors in dark mode
       expect(find.byType(DiveCard), findsOneWidget);
       expect(find.text('Cozumel'), findsOneWidget);
-      
+
       // Verify dark theme colors are applied (card should use dark surface color)
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(DiveCard),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(DiveCard),
+              matching: find.byType(Container),
+            )
+            .first,
       );
-      
+
       // Verify container exists with decoration
       expect(container.decoration, isNotNull);
     });
 
-    testWidgets('truncates long location names with ellipsis', (WidgetTester tester) async {
+    testWidgets('truncates long location names with ellipsis',
+        (WidgetTester tester) async {
       final longNameDive = testDiveSession.copyWith(
-        lugarBuceo: 'Very Long Location Name That Should Be Truncated With Ellipsis',
+        lugarBuceo:
+            'Very Long Location Name That Should Be Truncated With Ellipsis',
       );
 
       await tester.pumpWidget(
@@ -201,9 +205,10 @@ void main() {
 
       // Verify text widget has overflow handling
       final textWidget = tester.widget<Text>(
-        find.text('Very Long Location Name That Should Be Truncated With Ellipsis'),
+        find.text(
+            'Very Long Location Name That Should Be Truncated With Ellipsis'),
       );
-      
+
       expect(textWidget.overflow, TextOverflow.ellipsis);
       expect(textWidget.maxLines, 1);
     });

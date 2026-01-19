@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:divelogtest/providers/dive_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/services/dive_service.dart';
 import 'package:divelogtest/services/user_service.dart';
 import 'package:divelogtest/services/export_service.dart';
 import 'package:divelogtest/theme.dart';
@@ -12,8 +12,15 @@ import 'package:logging/logging.dart';
 
 class AddEditDiveScreen extends StatefulWidget {
   final DiveSession? existingDive;
+  final UserService? userService;
+  final ExportService? exportService;
 
-  const AddEditDiveScreen({super.key, this.existingDive});
+  const AddEditDiveScreen({
+    super.key,
+    this.existingDive,
+    this.userService,
+    this.exportService,
+  });
 
   @override
   State<AddEditDiveScreen> createState() => _AddEditDiveScreenState();
@@ -22,9 +29,8 @@ class AddEditDiveScreen extends StatefulWidget {
 class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
   static final Logger _log = Logger('AddEditDiveScreen');
   final _formKey = GlobalKey<FormState>();
-  final _diveService = DiveService();
-  final _userService = UserService();
-  final _exportService = ExportService();
+  late final UserService _userService;
+  late final ExportService _exportService;
 
   bool _isLoading = false;
   bool get _isEditing => widget.existingDive != null;
@@ -66,6 +72,8 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
   @override
   void initState() {
     super.initState();
+    _userService = widget.userService ?? UserService();
+    _exportService = widget.exportService ?? ExportService();
     _initializeControllers();
     if (_isEditing) {
       _loadExistingData();
@@ -203,9 +211,9 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
       }
 
       if (_isEditing) {
-        await _diveService.updateDiveSession(diveSession);
+        await context.read<DiveProvider>().updateDive(diveSession);
       } else {
-        await _diveService.createDiveSession(diveSession);
+        await context.read<DiveProvider>().createDive(diveSession);
       }
 
       if (mounted) {
@@ -215,7 +223,9 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
       }
     } catch (e, stackTrace) {
       _log.severe('Error saving dive', e, stackTrace);
-      _showErrorSnackBar('Error: $e');
+      if (mounted) {
+        _showErrorSnackBar('Error: $e');
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -281,8 +291,6 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditing ? 'Editar Inmersión' : 'Nueva Inmersión'),

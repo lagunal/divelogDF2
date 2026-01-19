@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:divelogtest/providers/dive_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:divelogtest/models/dive_session.dart';
 import 'package:divelogtest/services/dive_service.dart';
@@ -21,9 +23,7 @@ class DiveListScreen extends StatefulWidget {
 class _DiveListScreenState extends State<DiveListScreen> {
   late final DiveService _diveService;
   final ExportService _exportService = ExportService();
-  List<DiveSession> _allDives = [];
-  List<DiveSession> _filteredDives = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   // Filter & Sort states
   String _searchQuery = '';
@@ -36,26 +36,12 @@ class _DiveListScreenState extends State<DiveListScreen> {
   void initState() {
     super.initState();
     _diveService = widget.diveService ?? DiveService();
-    _loadDives();
   }
 
   Future<void> _loadDives() async {
-    setState(() => _isLoading = true);
-    try {
-      await _diveService.initialize();
-      final userId = _getUserId();
-      final dives = userId != null
-          ? await _diveService.getDiveSessionsByUserId(userId)
-          : await _diveService.getAllDiveSessions();
-      setState(() {
-        _allDives = dives;
-        _filteredDives = dives;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    final userId = _getUserId();
+    if (userId != null) {
+      await context.read<DiveProvider>().refreshData(userId);
     }
   }
 
@@ -63,60 +49,54 @@ class _DiveListScreenState extends State<DiveListScreen> {
     try {
       return FirebaseAuth.instance.currentUser?.uid;
     } catch (_) {
-      // Return a dummy ID for tests where Firebase is not initialized
       return 'test-user';
     }
   }
 
-  void _applyFilters() {
-    setState(() {
-      _filteredDives = _allDives.where((dive) {
-        // Search filter
-        if (_searchQuery.isNotEmpty) {
-          final query = _searchQuery.toLowerCase();
-          if (!dive.lugarBuceo.toLowerCase().contains(query) &&
-              !dive.operadoraBuceo.toLowerCase().contains(query) &&
-              !dive.descripcionTrabajo.toLowerCase().contains(query)) {
-            return false;
-          }
-        }
-
-        // Location filter
-        if (_selectedLocation != null && dive.lugarBuceo != _selectedLocation) {
+  List<DiveSession> _getFilteredDives(List<DiveSession> allDives) {
+    List<DiveSession> filtered = allDives.where((dive) {
+      if (_searchQuery.isNotEmpty) {
+        final query = _searchQuery.toLowerCase();
+        if (!dive.lugarBuceo.toLowerCase().contains(query) &&
+            !dive.operadoraBuceo.toLowerCase().contains(query) &&
+            !dive.descripcionTrabajo.toLowerCase().contains(query)) {
           return false;
         }
+      }
 
-        // Operator filter
-        if (_selectedOperator != null &&
-            dive.operadoraBuceo != _selectedOperator) {
+      if (_selectedLocation != null && dive.lugarBuceo != _selectedLocation) {
+        return false;
+      }
+
+      if (_selectedOperator != null &&
+          dive.operadoraBuceo != _selectedOperator) {
+        return false;
+      }
+
+      if (_dateRange != null) {
+        if (dive.horaEntrada.isBefore(_dateRange!.start) ||
+            dive.horaEntrada
+                .isAfter(_dateRange!.end.add(const Duration(days: 1)))) {
           return false;
         }
+      }
 
-        // Date range filter
-        if (_dateRange != null) {
-          if (dive.horaEntrada.isBefore(_dateRange!.start) ||
-              dive.horaEntrada
-                  .isAfter(_dateRange!.end.add(const Duration(days: 1)))) {
-            return false;
-          }
-        }
+      return true;
+    }).toList();
 
-        return true;
-      }).toList();
-
-      // Apply sorting
-      _filteredDives.sort((a, b) {
-        switch (_sortBy) {
-          case 'depth':
-            return b.maximaProfundidad.compareTo(a.maximaProfundidad);
-          case 'duration':
-            return b.tiempoTotalInmersion.compareTo(a.tiempoTotalInmersion);
-          case 'date':
-          default:
-            return b.horaEntrada.compareTo(a.horaEntrada);
-        }
-      });
+    filtered.sort((a, b) {
+      switch (_sortBy) {
+        case 'depth':
+          return b.maximaProfundidad.compareTo(a.maximaProfundidad);
+        case 'duration':
+          return b.tiempoTotalInmersion.compareTo(a.tiempoTotalInmersion);
+        case 'date':
+        default:
+          return b.horaEntrada.compareTo(a.horaEntrada);
+      }
     });
+
+    return filtered;
   }
 
   void _clearFilters() {
@@ -126,7 +106,6 @@ class _DiveListScreenState extends State<DiveListScreen> {
       _selectedOperator = null;
       _dateRange = null;
       _sortBy = 'date';
-      _filteredDives = _allDives;
     });
   }
 
@@ -157,7 +136,6 @@ class _DiveListScreenState extends State<DiveListScreen> {
             _dateRange = dateRange;
             _sortBy = sortBy;
           });
-          _applyFilters();
           Navigator.pop(context);
         },
       ),
@@ -176,285 +154,265 @@ class _DiveListScreenState extends State<DiveListScreen> {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Todas las Inmersiones',
-            style: theme.textTheme.titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        actions: [
-          if (_filteredDives.isNotEmpty && !_isLoading)
-            PopupMenuButton<String>(
-              icon: Icon(Icons.share, color: colorScheme.primary),
-              tooltip: 'Exportar Lista',
-              onSelected: (value) async {
-                setState(() => _isLoading = true);
-                try {
-                  if (value == 'pdf') {
-                    await _exportService.exportDivesListToPdf(_filteredDives);
-                  } else if (value == 'csv') {
-                    await _exportService.exportDivesListToCsv(_filteredDives);
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error al exportar: $value - $e')),
-                    );
-                  }
-                } finally {
-                  if (mounted) setState(() => _isLoading = false);
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'pdf',
-                  child: Row(
-                    children: [
-                      Icon(Icons.picture_as_pdf, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Exportar Lista PDF'),
-                    ],
-                  ),
+    return Consumer<DiveProvider>(
+      builder: (context, diveProvider, child) {
+        final filteredDives = _getFilteredDives(diveProvider.allDives);
+        final isLoading = diveProvider.isLoading || _isLoading;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Todas las Inmersiones',
+                style: theme.textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold)),
+            actions: [
+              if (filteredDives.isNotEmpty && !isLoading)
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.share, color: colorScheme.primary),
+                  tooltip: 'Exportar Lista',
+                  onSelected: (value) async {
+                    setState(() => _isLoading = true);
+                    try {
+                      if (value == 'pdf') {
+                        await _exportService
+                            .exportDivesListToPdf(filteredDives);
+                      } else if (value == 'csv') {
+                        await _exportService
+                            .exportDivesListToCsv(filteredDives);
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('Error al exportar: $value - $e')),
+                        );
+                      }
+                    } finally {
+                      if (mounted) setState(() => _isLoading = false);
+                    }
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'pdf',
+                      child: Row(
+                        children: [
+                          Icon(Icons.picture_as_pdf, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Exportar Lista PDF'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'csv',
+                      child: Row(
+                        children: [
+                          Icon(Icons.table_chart, color: Colors.green),
+                          SizedBox(width: 8),
+                          Text('Exportar Lista CSV'),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const PopupMenuItem<String>(
-                  value: 'csv',
-                  child: Row(
-                    children: [
-                      Icon(Icons.table_chart, color: Colors.green),
-                      SizedBox(width: 8),
-                      Text('Exportar Lista CSV'),
-                    ],
-                  ),
+              IconButton(
+                icon: Icon(Icons.add, color: colorScheme.primary),
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AddEditDiveScreen()),
+                  );
+                  _loadDives();
+                },
+                tooltip: 'Nueva Inmersión',
+              ),
+              if (_hasActiveFilters)
+                IconButton(
+                  icon: Icon(Icons.clear_all, color: colorScheme.primary),
+                  onPressed: _clearFilters,
+                  tooltip: 'Limpiar filtros',
+                ),
+            ],
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                _buildSearchBar(theme, colorScheme, isDark),
+                if (_hasActiveFilters) _buildActiveFilters(colorScheme),
+                _buildResultsCount(theme, colorScheme, filteredDives),
+                Expanded(
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : filteredDives.isEmpty
+                          ? _buildEmptyState()
+                          : _buildDiveList(filteredDives),
                 ),
               ],
             ),
-          IconButton(
-            icon: Icon(Icons.add, color: colorScheme.primary),
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const AddEditDiveScreen()),
-              );
-              if (result == true) _loadDives();
-            },
-            tooltip: 'Nueva Inmersión',
           ),
-          if (_hasActiveFilters)
-            IconButton(
-              icon: Icon(Icons.clear_all, color: colorScheme.primary),
-              onPressed: _clearFilters,
-              tooltip: 'Limpiar filtros',
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchBar(
+      ThemeData theme, ColorScheme colorScheme, bool isDark) {
+    return Padding(
+      padding: AppSpacing.paddingMd,
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                boxShadow: [AppEffects.softShadow],
+              ),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() => _searchQuery = value);
+                },
+                decoration: InputDecoration(
+                  hintText: 'Buscar inmersiones...',
+                  prefixIcon: Icon(Icons.search, color: colorScheme.primary),
+                  filled: true,
+                  fillColor: isDark ? colorScheme.surface : Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: AppSpacing.horizontalMd,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: _hasActiveFilters
+                  ? colorScheme.primaryContainer
+                  : (isDark ? colorScheme.surface : Colors.white),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              boxShadow: [AppEffects.softShadow],
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.tune,
+                color: _hasActiveFilters
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.primary,
+              ),
+              onPressed: _showFilterSheet,
+              tooltip: 'Filtros',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActiveFilters(ColorScheme colorScheme) {
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.only(bottom: 8),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: AppSpacing.horizontalMd,
+        children: [
+          if (_selectedLocation != null)
+            FilterChip(
+              label: Text(_selectedLocation!),
+              icon: const Icon(Icons.location_on, size: 16),
+              onTap: () => setState(() => _selectedLocation = null),
+            ),
+          if (_selectedOperator != null)
+            FilterChip(
+              label: Text(_selectedOperator!),
+              icon: const Icon(Icons.business, size: 16),
+              onTap: () => setState(() => _selectedOperator = null),
+            ),
+          if (_dateRange != null)
+            FilterChip(
+              label: Text(
+                '${DateFormat('dd/MM').format(_dateRange!.start)} - ${DateFormat('dd/MM').format(_dateRange!.end)}',
+              ),
+              icon: const Icon(Icons.date_range, size: 16),
+              onTap: () => setState(() => _dateRange = null),
             ),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Search and Filter Bar
-            Padding(
-              padding: AppSpacing.paddingMd,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        boxShadow: [AppEffects.softShadow],
-                      ),
-                      child: TextField(
-                        onChanged: (value) {
-                          _searchQuery = value;
-                          _applyFilters();
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Buscar inmersiones...',
-                          hintStyle: theme.textTheme.bodyMedium?.withColor(
-                            colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                          ),
-                          prefixIcon:
-                              Icon(Icons.search, color: colorScheme.primary),
-                          filled: true,
-                          fillColor:
-                              isDark ? colorScheme.surface : Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            borderSide: BorderSide(
-                              color: colorScheme.outline.withValues(alpha: 0.1),
-                              width: 1,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            borderSide: BorderSide(
-                              color: colorScheme.outline.withValues(alpha: 0.1),
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            borderSide: BorderSide(
-                              color: colorScheme.primary.withValues(alpha: 0.3),
-                              width: 1.5,
-                            ),
-                          ),
-                          contentPadding: AppSpacing.horizontalMd,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: _hasActiveFilters
-                          ? colorScheme.primaryContainer
-                          : (isDark ? colorScheme.surface : Colors.white),
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      boxShadow: [AppEffects.softShadow],
-                      border: Border.all(
-                        color: _hasActiveFilters
-                            ? colorScheme.primary
-                            : colorScheme.outline.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.tune,
-                        color: _hasActiveFilters
-                            ? colorScheme.onPrimaryContainer
-                            : colorScheme.primary,
-                      ),
-                      onPressed: _showFilterSheet,
-                      tooltip: 'Filtros',
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    );
+  }
 
-            // Active Filters Chips
-            if (_hasActiveFilters)
-              Container(
-                height: 40,
-                padding: AppSpacing.horizontalMd,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    if (_selectedLocation != null)
-                      FilterChip(
-                        label: Text(_selectedLocation!),
-                        icon: const Icon(Icons.location_on, size: 16),
-                        onTap: () {
-                          setState(() => _selectedLocation = null);
-                          _applyFilters();
-                        },
-                      ),
-                    if (_selectedOperator != null)
-                      FilterChip(
-                        label: Text(_selectedOperator!),
-                        icon: const Icon(Icons.business, size: 16),
-                        onTap: () {
-                          setState(() => _selectedOperator = null);
-                          _applyFilters();
-                        },
-                      ),
-                    if (_dateRange != null)
-                      FilterChip(
-                        label: Text(
-                          '${DateFormat('dd/MM').format(_dateRange!.start)} - ${DateFormat('dd/MM').format(_dateRange!.end)}',
-                        ),
-                        icon: const Icon(Icons.date_range, size: 16),
-                        onTap: () {
-                          setState(() => _dateRange = null);
-                          _applyFilters();
-                        },
-                      ),
-                  ],
+  Widget _buildResultsCount(ThemeData theme, ColorScheme colorScheme,
+      List<DiveSession> filteredDives) {
+    return Padding(
+      padding: AppSpacing.horizontalMd.copyWith(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '${filteredDives.length} inmersiones',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (filteredDives.isNotEmpty)
+            TextButton.icon(
+              icon: const Icon(Icons.sort, size: 16),
+              label: Text(_getSortLabel()),
+              onPressed: _showFilterSheet,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: EmptyStateCard(
+        icon: _hasActiveFilters ? Icons.search_off : Icons.scuba_diving,
+        title: _hasActiveFilters ? 'Sin resultados' : 'No hay inmersiones',
+        subtitle: _hasActiveFilters
+            ? 'Intenta con otros filtros'
+            : 'Registra tu primera inmersión',
+        actionLabel:
+            _hasActiveFilters ? 'Limpiar filtros' : 'Agregar Inmersión',
+        onAction: _hasActiveFilters
+            ? _clearFilters
+            : () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AddEditDiveScreen()),
+                );
+                _loadDives();
+              },
+      ),
+    );
+  }
+
+  Widget _buildDiveList(List<DiveSession> filteredDives) {
+    return RefreshIndicator(
+      onRefresh: _loadDives,
+      child: ListView.separated(
+        padding: AppSpacing.paddingMd,
+        itemCount: filteredDives.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final dive = filteredDives[index];
+          return DiveCard(
+            dive: dive,
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddEditDiveScreen(existingDive: dive),
                 ),
-              ),
-
-            // Results Count
-            Padding(
-              padding: AppSpacing.horizontalMd.copyWith(top: 8, bottom: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${_filteredDives.length} inmersiones',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (_filteredDives.isNotEmpty)
-                    TextButton.icon(
-                      icon: const Icon(Icons.sort, size: 16),
-                      label: Text(_getSortLabel()),
-                      onPressed: _showFilterSheet,
-                    ),
-                ],
-              ),
-            ),
-
-            // Dive List
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _filteredDives.isEmpty
-                      ? Center(
-                          child: EmptyStateCard(
-                            icon: _hasActiveFilters
-                                ? Icons.search_off
-                                : Icons.scuba_diving,
-                            title: _hasActiveFilters
-                                ? 'No se encontraron inmersiones'
-                                : 'No hay inmersiones registradas',
-                            subtitle: _hasActiveFilters
-                                ? 'Intenta con otros filtros'
-                                : 'Registra tu primera inmersión para comenzar',
-                            actionLabel: _hasActiveFilters
-                                ? 'Limpiar filtros'
-                                : 'Agregar Inmersión',
-                            onAction: _hasActiveFilters
-                                ? _clearFilters
-                                : () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AddEditDiveScreen()),
-                                    );
-                                    if (result == true) _loadDives();
-                                  },
-                          ),
-                        )
-                      : RefreshIndicator(
-                          onRefresh: _loadDives,
-                          child: ListView.separated(
-                            padding: AppSpacing.paddingMd,
-                            itemCount: _filteredDives.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (context, index) {
-                              final dive = _filteredDives[index];
-                              return DiveCard(
-                                dive: dive,
-                                onTap: () async {
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddEditDiveScreen(existingDive: dive),
-                                    ),
-                                  );
-                                  if (result == true) _loadDives();
-                                },
-                              );
-                            },
-                          ),
-                        ),
-            ),
-          ],
-        ),
+              );
+              _loadDives();
+            },
+          );
+        },
       ),
     );
   }
@@ -604,7 +562,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -618,8 +575,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   ],
                 ),
                 const SizedBox(height: 24),
-
-                // Sort By Section
                 Text('Ordenar por',
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
@@ -648,8 +603,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   ],
                 ),
                 const SizedBox(height: 24),
-
-                // Location Filter
                 Text('Lugar de buceo',
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
@@ -671,8 +624,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     }).toList(),
                   ),
                 const SizedBox(height: 24),
-
-                // Operator Filter
                 Text('Operadora',
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
@@ -694,8 +645,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     }).toList(),
                   ),
                 const SizedBox(height: 24),
-
-                // Date Range Filter
                 Text('Rango de fechas',
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
@@ -716,8 +665,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     onPressed: () => setState(() => _dateRange = null),
                   ),
                 const SizedBox(height: 32),
-
-                // Apply Button
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
