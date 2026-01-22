@@ -402,6 +402,7 @@ class _DiveListScreenState extends State<DiveListScreen> {
           final dive = filteredDives[index];
           return DiveCard(
             dive: dive,
+            contextId: 'list',
             onTap: () async {
               await Navigator.push(
                 context,

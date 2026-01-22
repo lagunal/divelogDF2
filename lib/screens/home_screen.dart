@@ -274,6 +274,7 @@ class HomeScreen extends StatelessWidget {
               final dive = recentDives[index];
               return DiveCard(
                 dive: dive,
+                contextId: 'home',
                 onTap: () {
                   Navigator.push(
                     context,

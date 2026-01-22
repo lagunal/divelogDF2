@@ -93,6 +93,10 @@ class DiveService {
     }
     _sessions.sort((a, b) => b.horaEntrada.compareTo(a.horaEntrada));
     await _storageService.saveDiveSession(session.toJson());
+    // Note: storageService calls databaseHelper, which now logs the DB write.
+    // We add a high-level log here for flow tracking.
+    _log.info(
+        'Local session updated in memory and storage request sent: ${session.id}');
   }
 
   Future<bool> _isOnlineCheck() async {

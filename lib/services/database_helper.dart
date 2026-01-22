@@ -131,11 +131,14 @@ class DatabaseHelper {
     try {
       final db = await database;
       final sessionToInsert = _prepareDataForInsert(session);
-      return db.insert(
+      final id = await db.insert(
         'dive_sessions',
         sessionToInsert,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+      _log.info(
+          'Dive session inserted into SQLite: ${session['id']} (Row ID: $id)');
+      return id;
     } catch (e) {
       _log.severe('Error inserting dive session', e);
       rethrow;
@@ -171,12 +174,15 @@ class DatabaseHelper {
     try {
       final db = await database;
       final sessionToUpdate = _prepareDataForInsert(session);
-      return db.update(
+      final rows = await db.update(
         'dive_sessions',
         sessionToUpdate,
         where: 'id = ?',
         whereArgs: [sessionToUpdate['id']],
       );
+      _log.info(
+          'Dive session updated in SQLite: ${session['id']} (Rows affected: $rows)');
+      return rows;
     } catch (e) {
       _log.severe('Error updating dive session', e);
       rethrow;

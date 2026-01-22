@@ -6,11 +6,13 @@ import 'package:intl/intl.dart';
 class DiveCard extends StatelessWidget {
   final DiveSession dive;
   final VoidCallback onTap;
+  final String? contextId;
 
   const DiveCard({
     super.key,
     required this.dive,
     required this.onTap,
+    this.contextId,
   });
 
   @override
@@ -20,7 +22,7 @@ class DiveCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Hero(
-      tag: 'dive_card_${dive.id}',
+      tag: 'dive_card_${contextId ?? ''}_${dive.id}',
       child: Material(
         color: Colors.transparent,
         child: InkWell(
