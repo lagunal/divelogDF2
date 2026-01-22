@@ -1,32 +1,57 @@
-# Dive Log App (Dreamflow)
+# Dive Log App (v2)
 
-A professional cross-platform mobile application (Android/iOS/Web) designed for divers to log, track, and manage their diving sessions efficiently. This app combines offline-first capabilities with cloud synchronization to ensure your dive data is always safe and accessible.
+A professional cross-platform mobile application (Android/iOS/Web) designed for divers to log, track, and manage their diving sessions efficiently. This app combines **offline-first** capabilities with seamless **cloud synchronization** (Firebase) to ensure your dive data is always safe, accessible, and accurately recorded.
 
 ## 📱 Features
 
--   **Digital Logbook:** Create detailed records of your dives, including:
-    -   General info (Location, Operator, Supervisor).
-    -   Dive data (Depth, Times, Gas mixtures).
-    -   Environmental conditions (Visibility, Temperature, Sea state).
-    -   Equipment used.
--   **Offline-First:** Fully functional without an internet connection. Data is stored locally and synced when online.
--   **Cloud Synchronization:** Seamlessly syncs data across devices using Firebase.
--   **Statistics:** Visual insights into your diving history (Total bottom time, Max depth, Dive counts).
--   **Export:** Generate professional reports of your dive logs in PDF or CSV formats.
--   **Authentication:** Secure user accounts via Firebase Authentication.
+-   **Professional Logbook:** Capture detailed dive data including:
+    -   **General:** Location, Operator, Supervisor, Buddy list.
+    -   **Technical:** Depth, Bottom Time, Gas Mixtures (Nitrox/Trimix), Decompression stops.
+    -   **Conditions:** Visibility, Temperature (Water/Surface), Current, Sea State (Beaufort).
+    -   **Equipment:** Suit type, Tank pressure, Weights.
+-   **Offline-First Architecture:**
+    -   Full functionality without internet access using local SQLite storage.
+    -   Automatic data queuing and background synchronization when connectivity is restored.
+-   **Cloud Sync & Backup:**
+    -   Real-time synchronization across multiple devices via Google Cloud Firestore.
+    -   Secure user authentication and data protection.
+-   **Premium UI/UX:**
+    -   Modern "Ocean" theme with glassmorphism effects and dynamic gradients.
+    -   Smooth Hero animations and intuitive navigation.
+-   **Statistics & Analytics:**
+    -   Visual insights: Total dives, cumulative bottom time, max depth.
+    -   Recent activity timeline.
+-   **Safety & Validation:**
+    -   Built-in safety checks for depth limits and no-decompression limits (NDL) warnings.
+    -   Robust error handling with user-friendly feedback.
+-   **Export & Sharing:**
+    -   Generate professional PDF dive logs.
+    -   Export data to CSV for external analysis.
 
 ## 🛠️ Tech Stack
 
 -   **Framework:** [Flutter](https://flutter.dev/) (Dart)
+-   **Architecture:** Hybrid Repository Pattern (Local + Cloud)
 -   **State Management:** [Provider](https://pub.dev/packages/provider)
 -   **Navigation:** [GoRouter](https://pub.dev/packages/go_router)
 -   **Backend:** [Firebase](https://firebase.google.com/)
-    -   Authentication
-    -   Cloud Firestore (NoSQL Database)
+    -   **Auth:** Secure email/password authentication.
+    -   **Firestore:** NoSQL cloud database for sync.
 -   **Local Storage:**
-    -   Mobile: [sqflite](https://pub.dev/packages/sqflite) (SQLite)
-    -   Web: [shared_preferences](https://pub.dev/packages/shared_preferences) (Fallback/Preview)
--   **Exporting:** [pdf](https://pub.dev/packages/pdf), [csv](https://pub.dev/packages/csv), [printing](https://pub.dev/packages/printing)
+    -   **Mobile:** [sqflite](https://pub.dev/packages/sqflite) (Structured SQL data).
+    -   **Web:** [shared_preferences](https://pub.dev/packages/shared_preferences) (Fallback).
+-   **Utilities:** `connectivity_plus` (Sync logic), `logging`, `pdf`, `printing`.
+
+## 🏗️ Architecture
+
+The application follows a strict **Offline-First Hybrid Repository** pattern to ensure reliability:
+
+1.  **UI Layer:** Reactive widgets consume `DiveProvider` for state.
+2.  **Provider Layer:** `DiveProvider` manages business logic and notifies UI of changes.
+3.  **Service Layer:**
+    -   `DiveService`: The central coordinator. It saves to Local Storage *first*, then attempts Cloud Sync.
+    -   `DatabaseHelper`: Manages raw SQLite commands (Insert/Query/Update/Delete).
+    -   `FirestoreDiveService`: Handles remote data synchronization and conflict resolution (Last-Write-Wins).
 
 ## 🚀 Getting Started
 
@@ -61,21 +86,12 @@ A professional cross-platform mobile application (Android/iOS/Web) designed for 
     flutter run
     ```
 
-## 🏗️ Architecture
+## 📝 Development Guidelines
 
-The app follows a **Hybrid Repository Pattern**:
-1.  **UI Layer:** Widgets and Screens consume Providers.
-2.  **Provider Layer:** Manages application state and business logic.
-3.  **Service Layer:**
-    -   `DiveService`: Orchestrates data flow between local storage and cloud.
-    -   `DatabaseHelper`: Manages local SQLite database.
-    -   `FirestoreDiveService`: Handles Firebase interactions.
-
-## 📝 Development
-
--   **Format Code:** `dart format .`
--   **Analyze Code:** `flutter analyze`
--   **Run Tests:** `flutter test`
+-   **Language:** Code in **English**, UI Text in **Spanish**.
+-   **Routing:** Always use `GoRouter` (`context.go` / `context.push`).
+-   **Styling:** Use `Theme.of(context)` and `lib/theme.dart` constants.
+-   **Code Quality:** Run `flutter analyze` before committing.
 
 ## 📄 License
 
