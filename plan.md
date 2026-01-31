@@ -381,10 +381,10 @@ Each dive session will capture the following information:
 - [ ] Golden: Critical screens updated snapshots after visual polish
 
 ### Phase 7: Payments and Subscriptions
-- [ ] Payment Integration Setup
-  - [ ] Choose payment provider (Stripe recommended for Flutter)
-  - [ ] Set up payment provider account and API keys
-  - [ ] Add payment dependencies (e.g., stripe_flutter, in_app_purchase)
+- [x] Payment Integration Setup
+  - [x] Choose payment provider (Stripe recommended for Flutter)
+  - [x] Set up payment provider account and API keys
+  - [x] Add payment dependencies (e.g., stripe_flutter, in_app_purchase)
 - [ ] Subscription Management
   - [ ] Define subscription tiers (e.g., Free, Pro, Premium)
   - [ ] Implement subscription model in data layer

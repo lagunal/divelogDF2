@@ -94,3 +94,6 @@ app.*.map.json
 
 # Mac files
 .DS_Store
+
+# Stripe Config
+lib/config/stripe_config.dart
