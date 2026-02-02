@@ -3,6 +3,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:divelogtest/firebase_options.dart';
+import 'package:flutter/foundation.dart';
 import 'package:divelogtest/config/stripe_config.dart';
 import 'package:divelogtest/screens/auth_wrapper.dart';
 import 'package:divelogtest/theme.dart';
@@ -41,7 +42,9 @@ void main() async {
 
   // Initialize Stripe
   Stripe.publishableKey = StripeConfig.publishableKey;
-  await Stripe.instance.applySettings();
+  if (!kIsWeb) {
+    await Stripe.instance.applySettings();
+  }
 
   // Run the app
   runApp(const MyApp());
