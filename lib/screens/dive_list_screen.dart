@@ -159,6 +159,38 @@ class _DiveListScreenState extends State<DiveListScreen> {
         final filteredDives = _getFilteredDives(diveProvider.allDives);
         final isLoading = diveProvider.isLoading || _isLoading;
 
+        if (diveProvider.error != null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Error')),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text('Ocurrió un error', style: theme.textTheme.titleLarge),
+                    const SizedBox(height: 8),
+                    SelectableText(
+                      diveProvider.error!,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: () => _loadDives(),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: Text('Todas las Inmersiones',
