@@ -69,8 +69,11 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildAppBar(BuildContext context, bool isDark) {
-    final userName =
-        FirebaseAuth.instance.currentUser?.displayName ?? 'Buceador';
+    // Get name from provider (Firestore) first, then Auth, then fallback
+    final diveProvider = context.watch<DiveProvider>();
+    final userName = diveProvider.userProfile?.name ??
+        FirebaseAuth.instance.currentUser?.displayName ??
+        'Buceador';
 
     return SliverAppBar(
       expandedHeight: 200,

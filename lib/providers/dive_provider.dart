@@ -2,16 +2,21 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:divelogtest/models/dive_session.dart';
+import 'package:divelogtest/models/user_profile.dart'; // Added import
 import 'package:divelogtest/services/dive_service.dart';
+import 'package:divelogtest/services/firestore_user_service.dart'; // Added import
 import 'package:logging/logging.dart';
 
 class DiveProvider extends ChangeNotifier {
   static final Logger _log = Logger('DiveProvider');
   final DiveService _diveService = DiveService();
+  final FirestoreUserService _userService =
+      FirestoreUserService(); // Added service
   StreamSubscription<SyncStatus>? _syncStatusSubscription;
 
   List<DiveSession> _allDives = [];
   Map<String, dynamic> _statistics = {};
+  UserProfile? _userProfile; // Added field
   bool _isLoading = false;
   String? _error;
   bool _isInitialized = false;
@@ -20,6 +25,8 @@ class DiveProvider extends ChangeNotifier {
   List<DiveSession> get allDives => List.unmodifiable(_allDives);
   List<DiveSession> get recentDives => _allDives.take(3).toList();
   Map<String, dynamic> get statistics => Map.unmodifiable(_statistics);
+  UserProfile? get userProfile => _userProfile; // Added getter
+
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get isInitialized => _isInitialized;
@@ -77,6 +84,7 @@ class DiveProvider extends ChangeNotifier {
     try {
       _allDives = await _diveService.getDiveSessionsByUserId(userId);
       _statistics = await _diveService.getStatistics(userId);
+      _userProfile = await _userService.getUserProfile(userId); // Fetch profile
     } catch (e) {
       _log.severe('Error loading dive data', e);
       rethrow;
