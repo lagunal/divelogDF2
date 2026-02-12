@@ -32,9 +32,13 @@ class DiveService {
   bool get isSyncing => _isSyncing;
   int get pendingSyncCount => _sessions.where((s) => !s.isSynced).length;
 
-  Future<void> initialize() async {
-    if (_isInitialized) return;
-    await _loadFromStorage();
+  String? _currentUserId;
+
+  Future<void> initialize(String userId) async {
+    if (_isInitialized && _currentUserId == userId) return;
+
+    _currentUserId = userId;
+    await _loadFromStorage(userId);
     _isInitialized = true;
 
     _initConnectivityListener();
@@ -72,9 +76,9 @@ class DiveService {
     _log.info('Connectivity status: ${_isOnline ? "Online" : "Offline"}');
   }
 
-  Future<void> _loadFromStorage() async {
+  Future<void> _loadFromStorage(String userId) async {
     try {
-      final data = await _storageService.loadDiveSessions();
+      final data = await _storageService.loadDiveSessions(userId);
       _sessions = data.map((json) => DiveSession.fromJson(json)).toList();
       _sessions.sort((a, b) => b.horaEntrada.compareTo(a.horaEntrada));
     } catch (e) {
@@ -113,7 +117,7 @@ class DiveService {
   }
 
   Future<DiveSession> createDiveSession(DiveSession session) async {
-    await initialize();
+    await initialize(session.userId);
 
     // 1. Create locally first (Offline First)
     var newSession = session.copyWith(
@@ -147,7 +151,7 @@ class DiveService {
   }
 
   Future<DiveSession> updateDiveSession(DiveSession session) async {
-    await initialize();
+    await initialize(session.userId);
 
     final index = _sessions.indexWhere((s) => s.id == session.id);
     if (index == -1) {
@@ -184,7 +188,7 @@ class DiveService {
   }
 
   Future<void> deleteDiveSession(String id, String userId) async {
-    await initialize();
+    await initialize(userId);
 
     final index = _sessions.indexWhere((session) => session.id == id);
     if (index == -1) {
@@ -236,7 +240,7 @@ class DiveService {
   }
 
   Future<void> syncPendingDives() async {
-    await initialize();
+    if (_currentUserId != null) await initialize(_currentUserId!);
 
     if (!_isOnline || _isSyncing) return;
 
@@ -286,7 +290,7 @@ class DiveService {
   // Read methods (Local Cache)
 
   Future<void> syncFromFirestore(String userId) async {
-    await initialize();
+    await initialize(userId);
     if (!_isOnline) return;
 
     try {
@@ -322,13 +326,13 @@ class DiveService {
     }
   }
 
-  Future<List<DiveSession>> getAllDiveSessions() async {
-    await initialize();
+  Future<List<DiveSession>> getAllDiveSessions(String userId) async {
+    await initialize(userId);
     return List.unmodifiable(_sessions);
   }
 
-  Future<DiveSession?> getDiveSessionById(String id) async {
-    await initialize();
+  Future<DiveSession?> getDiveSessionById(String id, String userId) async {
+    await initialize(userId);
     try {
       return _sessions.firstWhere((session) => session.id == id);
     } catch (e) {
@@ -337,8 +341,8 @@ class DiveService {
   }
 
   Future<List<DiveSession>> getDiveSessionsByDateRange(
-      DateTime start, DateTime end) async {
-    await initialize();
+      DateTime start, DateTime end, String userId) async {
+    await initialize(userId);
     return _sessions
         .where((session) =>
             session.horaEntrada
@@ -347,16 +351,18 @@ class DiveService {
         .toList();
   }
 
-  Future<List<DiveSession>> getDiveSessionsByLocation(String location) async {
-    await initialize();
+  Future<List<DiveSession>> getDiveSessionsByLocation(
+      String location, String userId) async {
+    await initialize(userId);
     return _sessions
         .where((session) =>
             session.lugarBuceo.toLowerCase().contains(location.toLowerCase()))
         .toList();
   }
 
-  Future<List<DiveSession>> getDiveSessionsByOperator(String operator) async {
-    await initialize();
+  Future<List<DiveSession>> getDiveSessionsByOperator(
+      String operator, String userId) async {
+    await initialize(userId);
     return _sessions
         .where((session) => session.operadoraBuceo
             .toLowerCase()
@@ -365,12 +371,12 @@ class DiveService {
   }
 
   Future<List<DiveSession>> getDiveSessionsByUserId(String userId) async {
-    await initialize();
+    await initialize(userId);
     return _sessions.where((session) => session.userId == userId).toList();
   }
 
   Future<Map<String, dynamic>> getStatistics(String userId) async {
-    await initialize();
+    await initialize(userId);
     final userSessions =
         _sessions.where((session) => session.userId == userId).toList();
     return calculateStatistics(userSessions);
@@ -411,7 +417,7 @@ class DiveService {
   }
 
   Future<List<String>> getUniqueLocations(String userId) async {
-    await initialize();
+    await initialize(userId);
     // Filter by userId locally as well? Yes.
     final locations = _sessions
         .where((s) => s.userId == userId)
@@ -423,7 +429,7 @@ class DiveService {
   }
 
   Future<List<String>> getUniqueOperators(String userId) async {
-    await initialize();
+    await initialize(userId);
     final operators = _sessions
         .where((s) => s.userId == userId)
         .map((s) => s.operadoraBuceo)

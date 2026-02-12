@@ -145,10 +145,19 @@ class DatabaseHelper {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getAllDiveSessions() async {
+  Future<List<Map<String, dynamic>>> getAllDiveSessions(String? userId) async {
     try {
       final db = await database;
-      return db.query('dive_sessions', orderBy: 'createdAt DESC');
+      if (userId != null) {
+        return db.query(
+          'dive_sessions',
+          where: 'userId = ?',
+          whereArgs: [userId],
+          orderBy: 'createdAt DESC',
+        );
+      } else {
+        return db.query('dive_sessions', orderBy: 'createdAt DESC');
+      }
     } catch (e) {
       _log.severe('Error retrieving dive sessions', e);
       rethrow;

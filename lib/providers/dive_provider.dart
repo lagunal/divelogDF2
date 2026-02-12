@@ -35,8 +35,10 @@ class DiveProvider extends ChangeNotifier {
   int get pendingSyncCount => _diveService.pendingSyncCount;
   SyncStatus get syncStatus => _syncStatus;
 
+  String? _currentUserId; // Track initialized user
+
   Future<void> initialize(String userId) async {
-    if (_isInitialized) {
+    if (_isInitialized && _currentUserId == userId) {
       _log.info('DiveProvider already initialized for user: $userId');
       return;
     }
@@ -45,6 +47,7 @@ class DiveProvider extends ChangeNotifier {
     _setLoading(true);
 
     try {
+      _currentUserId = userId;
       await _diveService.syncFromFirestore(userId);
       await _loadAllData(userId);
       _isInitialized = true;
@@ -206,6 +209,18 @@ class DiveProvider extends ChangeNotifier {
     } catch (e) {
       _log.severe('Error during manual sync', e);
     }
+  }
+
+  void clear() {
+    _allDives = [];
+    _statistics = {};
+    _userProfile = null;
+    _currentUserId = null;
+    _isInitialized = false;
+    _error = null;
+    _isLoading = false;
+    notifyListeners();
+    _log.info('DiveProvider state cleared');
   }
 
   @override

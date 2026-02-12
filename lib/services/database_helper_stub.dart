@@ -14,7 +14,8 @@ class DatabaseHelper {
     throw UnimplementedError('Not supported on Web');
   }
 
-  Future<List<Map<String, dynamic>>> getAllDiveSessions() async {
+  Future<List<Map<String, dynamic>>> getAllDiveSessions(
+      [String? userId]) async {
     throw UnimplementedError('Not supported on Web');
   }
 

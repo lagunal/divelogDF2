@@ -16,7 +16,8 @@ class StorageService {
     try {
       if (kIsWeb) {
         // For web, we still have to load all, update one, and save all
-        final sessions = await loadDiveSessions();
+        final sessions =
+            await loadDiveSessions(null); // Load all for web to preserve others
         final index = sessions.indexWhere((s) => s['id'] == session['id']);
         if (index != -1) {
           sessions[index] = session;
@@ -51,12 +52,16 @@ class StorageService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> loadDiveSessions() async {
+  Future<List<Map<String, dynamic>>> loadDiveSessions(String? userId) async {
     try {
       if (kIsWeb) {
-        return await _webStorage!.loadDiveSessions();
+        final sessions = await _webStorage!.loadDiveSessions();
+        if (userId != null) {
+          return sessions.where((s) => s['userId'] == userId).toList();
+        }
+        return sessions;
       } else {
-        return await _dbHelper!.getAllDiveSessions();
+        return await _dbHelper!.getAllDiveSessions(userId);
       }
     } catch (e) {
       _log.severe('Error loading dive sessions', e);
