@@ -21,11 +21,11 @@ class FakeDiveProvider extends ChangeNotifier implements DiveProvider {
 
   @override
   Map<String, dynamic> get statistics => {
-    'totalDives': 10,
-    'totalBottomTime': 500.0,
-    'deepestDive': 30.0,
-    'averageDepth': 15.0,
-  };
+        'totalDives': 10,
+        'totalBottomTime': 500.0,
+        'deepestDive': 30.0,
+        'averageDepth': 15.0,
+      };
 
   @override
   bool get isLoading => false;
@@ -76,7 +76,15 @@ class FakeDiveProvider extends ChangeNotifier implements DiveProvider {
   Future<void> manualSync() async {}
 
   @override
-  void dispose() {}
+  UserProfile? get userProfile => null;
+
+  @override
+  void clear() {}
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }
 
 class MockUserService implements UserService {
@@ -176,7 +184,8 @@ class MockAuthManager extends FirebaseAuthManager {
 }
 
 void main() {
-  testWidgets('Home Screen renders correctly with Provider', (WidgetTester tester) async {
+  testWidgets('Home Screen renders correctly with Provider',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
@@ -190,15 +199,15 @@ void main() {
 
     // Verify app bar title
     expect(find.text('Bitácora de Buceo'), findsOneWidget);
-    
+
     // Verify tabs are present (Home, Logbook, Stats, Profile)
     // Note: HomeScreen might just be the dashboard part if used inside MainNavigationScreen
     // Checking HomeScreen implementation: It's the dashboard.
-    
+
     // Check for "Resumen" or similar
     // Check for Quick Actions
     expect(find.text('Nueva Inmersión'), findsOneWidget);
-    
+
     // Check for statistics
     expect(find.text('10'), findsOneWidget); // Total dives from fake provider
   });
@@ -220,7 +229,7 @@ void main() {
     expect(find.text('Test User'), findsOneWidget);
     expect(find.text('test@example.com'), findsOneWidget);
     expect(find.text('Open Water'), findsOneWidget);
-    
+
     // Verify stats on profile
     expect(find.text('10'), findsOneWidget); // Total dives
   });
