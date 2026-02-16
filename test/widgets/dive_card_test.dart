@@ -13,6 +13,7 @@ void main() {
         id: 'test-1',
         userId: 'user-1',
         cliente: 'Test Client',
+        buque: 'Test Vessel',
         operadoraBuceo: 'Test Operator',
         direccionOperadora: 'Test Address',
         lugarBuceo: 'Cozumel',

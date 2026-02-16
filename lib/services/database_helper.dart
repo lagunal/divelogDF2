@@ -26,7 +26,7 @@ class DatabaseHelper {
 
       return openDatabase(
         path,
-        version: 2,
+        version: 3,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       );
@@ -44,6 +44,7 @@ class DatabaseHelper {
           id TEXT PRIMARY KEY,
           userId TEXT NOT NULL,
           cliente TEXT NOT NULL,
+          buque TEXT NOT NULL,
           operadoraBuceo TEXT NOT NULL,
           direccionOperadora TEXT NOT NULL,
           lugarBuceo TEXT NOT NULL,
@@ -111,6 +112,16 @@ class DatabaseHelper {
       } catch (e) {
         _log.warning(
             'Error upgrading database to v2 (columns may already exist)', e);
+      }
+    }
+    if (oldVersion < 3) {
+      try {
+        await db.execute(
+            'ALTER TABLE dive_sessions ADD COLUMN buque TEXT DEFAULT ""');
+        _log.info('Database upgraded to v3: added buque column');
+      } catch (e) {
+        _log.warning(
+            'Error upgrading database to v3 (column may already exist)', e);
       }
     }
   }

@@ -37,6 +37,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
 
   // Controllers for text fields
   late TextEditingController _clienteController;
+  late TextEditingController _buqueController;
   late TextEditingController _operadoraController;
   late TextEditingController _direccionController;
   late TextEditingController _lugarBuceoController;
@@ -82,6 +83,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
 
   void _initializeControllers() {
     _clienteController = TextEditingController();
+    _buqueController = TextEditingController();
     _operadoraController = TextEditingController();
     _direccionController = TextEditingController();
     _lugarBuceoController = TextEditingController();
@@ -104,6 +106,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
   void _loadExistingData() {
     final dive = widget.existingDive!;
     _clienteController.text = dive.cliente;
+    _buqueController.text = dive.buque;
     _operadoraController.text = dive.operadoraBuceo;
     _direccionController.text = dive.direccionOperadora;
     _lugarBuceoController.text = dive.lugarBuceo;
@@ -136,6 +139,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
   @override
   void dispose() {
     _clienteController.dispose();
+    _buqueController.dispose();
     _operadoraController.dispose();
     _direccionController.dispose();
     _lugarBuceoController.dispose();
@@ -242,6 +246,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
       id: _isEditing ? widget.existingDive!.id : '',
       userId: user.id,
       cliente: _clienteController.text,
+      buque: _buqueController.text,
       operadoraBuceo: _operadoraController.text,
       direccionOperadora: _direccionController.text,
       lugarBuceo: _lugarBuceoController.text,
@@ -401,6 +406,14 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           controller: _clienteController,
           label: 'Cliente',
           prefixIcon: Icons.person,
+          required: true,
+          validator: Validators.required,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        CustomTextField(
+          controller: _buqueController,
+          label: 'Buque/Instalación',
+          prefixIcon: Icons.directions_boat,
           required: true,
           validator: Validators.required,
         ),

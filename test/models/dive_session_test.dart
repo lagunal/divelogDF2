@@ -8,6 +8,7 @@ void main() {
       id: 'id-1',
       userId: 'user-1',
       cliente: 'Cliente',
+      buque: 'Test Buque',
       operadoraBuceo: 'Operadora',
       direccionOperadora: 'Dirección',
       lugarBuceo: 'Lugar',
@@ -46,7 +47,8 @@ void main() {
       expect(decoded.nombreBuzos, base.nombreBuzos);
       expect(decoded.maximaProfundidad, base.maximaProfundidad);
       expect(decoded.tiempoTotalInmersion, base.tiempoTotalInmersion);
-      expect(decoded.horaEntrada.toIso8601String(), base.horaEntrada.toIso8601String());
+      expect(decoded.horaEntrada.toIso8601String(),
+          base.horaEntrada.toIso8601String());
     });
 
     test('fromJson supports nombreBuzos as JSON-encoded String', () {

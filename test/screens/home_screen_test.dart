@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:divelogtest/providers/dive_provider.dart';
 import 'package:divelogtest/screens/home_screen.dart';
 import 'package:divelogtest/models/dive_session.dart';
+import 'package:divelogtest/models/user_profile.dart';
 import 'package:divelogtest/services/dive_service.dart';
 
 // Mock DiveProvider with sample data
@@ -16,11 +17,11 @@ class MockDiveProviderWithDives extends ChangeNotifier implements DiveProvider {
 
   @override
   Map<String, dynamic> get statistics => {
-    'totalDives': 5,
-    'totalBottomTime': 250.0,
-    'deepestDive': 30.0,
-    'averageDepth': 18.5,
-  };
+        'totalDives': 5,
+        'totalBottomTime': 250.0,
+        'deepestDive': 30.0,
+        'averageDepth': 18.5,
+      };
 
   @override
   bool get isLoading => false;
@@ -71,38 +72,51 @@ class MockDiveProviderWithDives extends ChangeNotifier implements DiveProvider {
   DiveSession? getDiveById(String id) => null;
 
   @override
-  void dispose() {}
+  UserProfile? get userProfile => null;
+
+  @override
+  void clear() {}
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   List<DiveSession> _createMockDives() {
-    return List.generate(5, (i) => DiveSession(
-      id: 'dive-$i',
-      userId: 'user-1',
-      cliente: 'Cliente $i',
-      operadoraBuceo: 'Operadora $i',
-      direccionOperadora: 'Dirección $i',
-      lugarBuceo: 'Lugar $i',
-      tipoBuceo: 'Scuba',
-      nombreBuzos: ['Buzo A', 'Buzo B'],
-      supervisorBuceo: 'Supervisor',
-      estadoMar: 2,
-      visibilidad: 20,
-      temperaturaSuperior: 25,
-      temperaturaAgua: 24,
-      corrienteAgua: 'Leve',
-      tipoAgua: 'Salada',
-      horaEntrada: DateTime.now().subtract(Duration(days: i)),
-      maximaProfundidad: 20.0 + i,
-      tiempoIntervaloSuperficie: 60,
-      tiempoFondo: 45.0 + i * 5,
-      tiempoTotalInmersion: 50.0 + i * 5,
-      horaSalida: DateTime.now().subtract(Duration(days: i)).add(const Duration(hours: 1)),
-      descripcionTrabajo: 'Trabajo $i',
-      descompresionUtilizada: 'Ninguna',
-      tiempoSupervisionAcumulado: 2.0,
-      tiempoBuceoAcumulado: 1.0,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ));
+    return List.generate(
+        5,
+        (i) => DiveSession(
+              id: 'dive-$i',
+              userId: 'user-1',
+              cliente: 'Cliente $i',
+              buque: 'Buque $i',
+              operadoraBuceo: 'Operadora $i',
+              direccionOperadora: 'Dirección $i',
+              lugarBuceo: 'Lugar $i',
+              tipoBuceo: 'Scuba',
+              nombreBuzos: ['Buzo A', 'Buzo B'],
+              supervisorBuceo: 'Supervisor',
+              estadoMar: 2,
+              visibilidad: 20,
+              temperaturaSuperior: 25,
+              temperaturaAgua: 24,
+              corrienteAgua: 'Leve',
+              tipoAgua: 'Salada',
+              horaEntrada: DateTime.now().subtract(Duration(days: i)),
+              maximaProfundidad: 20.0 + i,
+              tiempoIntervaloSuperficie: 60,
+              tiempoFondo: 45.0 + i * 5,
+              tiempoTotalInmersion: 50.0 + i * 5,
+              horaSalida: DateTime.now()
+                  .subtract(Duration(days: i))
+                  .add(const Duration(hours: 1)),
+              descripcionTrabajo: 'Trabajo $i',
+              descompresionUtilizada: 'Ninguna',
+              tiempoSupervisionAcumulado: 2.0,
+              tiempoBuceoAcumulado: 1.0,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ));
   }
 }
 
@@ -116,11 +130,11 @@ class MockDiveProviderEmpty extends ChangeNotifier implements DiveProvider {
 
   @override
   Map<String, dynamic> get statistics => {
-    'totalDives': 0,
-    'totalBottomTime': 0.0,
-    'deepestDive': 0.0,
-    'averageDepth': 0.0,
-  };
+        'totalDives': 0,
+        'totalBottomTime': 0.0,
+        'deepestDive': 0.0,
+        'averageDepth': 0.0,
+      };
 
   @override
   bool get isLoading => false;
@@ -171,7 +185,15 @@ class MockDiveProviderEmpty extends ChangeNotifier implements DiveProvider {
   Future<void> manualSync() async {}
 
   @override
-  void dispose() {}
+  UserProfile? get userProfile => null;
+
+  @override
+  void clear() {}
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }
 
 void main() {
@@ -191,7 +213,7 @@ void main() {
 
       // Verify app bar title
       expect(find.text('Bitácora de Buceo'), findsOneWidget);
-      
+
       // Verify quick action buttons exist
       expect(find.text('Nueva Inmersión'), findsOneWidget);
       expect(find.text('Ver Todas'), findsOneWidget);
@@ -202,12 +224,13 @@ void main() {
 
       // Verify recent dives section exists
       expect(find.text('Inmersiones Recientes'), findsOneWidget);
-      
+
       // Should show at least one dive card
       expect(find.text('Lugar 0'), findsOneWidget);
     });
 
-    testWidgets('shows empty state correctly when no dives', (WidgetTester tester) async {
+    testWidgets('shows empty state correctly when no dives',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider<DiveProvider>.value(
@@ -221,15 +244,16 @@ void main() {
 
       // Verify empty state message is shown
       expect(find.text('No hay inmersiones registradas'), findsOneWidget);
-      
+
       // Quick actions should still be available
       expect(find.text('Nueva Inmersión'), findsOneWidget);
-      
+
       // Statistics should show zeros
       expect(find.text('0'), findsWidgets); // Multiple zeros in stats
     });
 
-    testWidgets('quick action buttons have semantics', (WidgetTester tester) async {
+    testWidgets('quick action buttons have semantics',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider<DiveProvider>.value(
@@ -242,9 +266,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find buttons by text and verify they are tappable
-      final newDiveButton = find.widgetWithText(ElevatedButton, 'Nueva Inmersión');
+      final newDiveButton =
+          find.widgetWithText(ElevatedButton, 'Nueva Inmersión');
       expect(newDiveButton, findsOneWidget);
-      
+
       final viewAllButton = find.widgetWithText(OutlinedButton, 'Ver Todas');
       expect(viewAllButton, findsOneWidget);
 

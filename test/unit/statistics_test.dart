@@ -38,11 +38,13 @@ void main() {
   });
 }
 
-DiveSession _createSession({required double depth, required double bottomTime}) {
+DiveSession _createSession(
+    {required double depth, required double bottomTime}) {
   return DiveSession(
     id: 'test-id',
     userId: 'user-id',
     cliente: 'Test Client',
+    buque: 'Test Ship',
     operadoraBuceo: 'Test Op',
     direccionOperadora: 'Address',
     lugarBuceo: 'Location',

@@ -14,7 +14,7 @@ class MockDiveService implements DiveService {
   }
 
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize(String userId) async {}
 
   @override
   Future<List<DiveSession>> getDiveSessionsByUserId(String userId) async {
@@ -22,7 +22,7 @@ class MockDiveService implements DiveService {
   }
 
   @override
-  Future<List<DiveSession>> getAllDiveSessions() async {
+  Future<List<DiveSession>> getAllDiveSessions(String userId) async {
     return _sessions;
   }
 
@@ -52,23 +52,25 @@ class MockDiveService implements DiveService {
   }
 
   @override
-  Future<DiveSession?> getDiveSessionById(String id) async {
+  Future<DiveSession?> getDiveSessionById(String id, String userId) async {
     throw UnimplementedError();
   }
 
   @override
   Future<List<DiveSession>> getDiveSessionsByDateRange(
-      DateTime start, DateTime end) async {
+      DateTime start, DateTime end, String userId) async {
     throw UnimplementedError();
   }
 
   @override
-  Future<List<DiveSession>> getDiveSessionsByLocation(String location) async {
+  Future<List<DiveSession>> getDiveSessionsByLocation(
+      String location, String userId) async {
     throw UnimplementedError();
   }
 
   @override
-  Future<List<DiveSession>> getDiveSessionsByOperator(String operator) async {
+  Future<List<DiveSession>> getDiveSessionsByOperator(
+      String operator, String userId) async {
     throw UnimplementedError();
   }
 
@@ -161,6 +163,7 @@ void main() {
         id: '1',
         userId: 'user1',
         lugarBuceo: 'Cozumel',
+        buque: 'Test Buque',
         operadoraBuceo: 'Blue Magic',
         horaEntrada: DateTime.now(),
         horaSalida: DateTime.now().add(const Duration(minutes: 45)),
@@ -209,6 +212,7 @@ void main() {
         id: '1',
         userId: 'user1',
         lugarBuceo: 'Cozumel',
+        buque: 'Test Buque',
         operadoraBuceo: 'Blue Magic',
         horaEntrada: DateTime.now(),
         horaSalida: DateTime.now().add(const Duration(minutes: 45)),
