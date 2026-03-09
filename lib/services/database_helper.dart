@@ -26,7 +26,7 @@ class DatabaseHelper {
 
       return openDatabase(
         path,
-        version: 3,
+        version: 4,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       );
@@ -89,6 +89,9 @@ class DatabaseHelper {
           totalDives INTEGER NOT NULL,
           totalBottomTime REAL NOT NULL,
           deepestDive REAL NOT NULL,
+          photoUrl TEXT,
+          bloodType TEXT,
+          emergencyContact TEXT,
           createdAt TEXT NOT NULL,
           updatedAt TEXT NOT NULL
         )
@@ -122,6 +125,19 @@ class DatabaseHelper {
       } catch (e) {
         _log.warning(
             'Error upgrading database to v3 (column may already exist)', e);
+      }
+    }
+
+    if (oldVersion < 4) {
+      try {
+        await db.execute('ALTER TABLE user_profiles ADD COLUMN photoUrl TEXT');
+        await db.execute('ALTER TABLE user_profiles ADD COLUMN bloodType TEXT');
+        await db.execute(
+            'ALTER TABLE user_profiles ADD COLUMN emergencyContact TEXT');
+        _log.info('Database upgraded to v4: added profile fields');
+      } catch (e) {
+        _log.warning(
+            'Error upgrading database to v4 (columns may already exist)', e);
       }
     }
   }

@@ -23,14 +23,33 @@ class FirestoreUserService {
     String? certificationLevel,
     String? certificationNumber,
     DateTime? certificationDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
   }) async {
     try {
       final doc = await _usersCollection.doc(userId).get();
       final profile = doc.exists
-          ? _updateExistingProfile(doc, name, email, certificationLevel,
-              certificationNumber, certificationDate)
-          : _createNewProfile(userId, name, email, certificationLevel,
-              certificationNumber, certificationDate);
+          ? _updateExistingProfile(
+              doc,
+              name,
+              email,
+              certificationLevel,
+              certificationNumber,
+              certificationDate,
+              photoUrl,
+              bloodType,
+              emergencyContact)
+          : _createNewProfile(
+              userId,
+              name,
+              email,
+              certificationLevel,
+              certificationNumber,
+              certificationDate,
+              photoUrl,
+              bloodType,
+              emergencyContact);
 
       await _usersCollection.doc(userId).set(profile.toFirestore());
       _log.info('User profile saved to Firestore: $userId');
@@ -48,6 +67,9 @@ class FirestoreUserService {
     String? certLevel,
     String? certNum,
     DateTime? certDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
   ) {
     final existing = UserProfile.fromFirestore(doc.data()!);
     return existing.copyWith(
@@ -56,6 +78,9 @@ class FirestoreUserService {
       certificationLevel: certLevel ?? existing.certificationLevel,
       certificationNumber: certNum ?? existing.certificationNumber,
       certificationDate: certDate ?? existing.certificationDate,
+      photoUrl: photoUrl ?? existing.photoUrl,
+      bloodType: bloodType ?? existing.bloodType,
+      emergencyContact: emergencyContact ?? existing.emergencyContact,
       updatedAt: DateTime.now(),
     );
   }
@@ -67,6 +92,9 @@ class FirestoreUserService {
     String? certLevel,
     String? certNum,
     DateTime? certDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
   ) {
     final now = DateTime.now();
     return UserProfile(
@@ -76,6 +104,9 @@ class FirestoreUserService {
       certificationLevel: certLevel,
       certificationNumber: certNum,
       certificationDate: certDate,
+      photoUrl: photoUrl,
+      bloodType: bloodType,
+      emergencyContact: emergencyContact,
       totalDives: 0,
       totalBottomTime: 0.0,
       deepestDive: 0.0,

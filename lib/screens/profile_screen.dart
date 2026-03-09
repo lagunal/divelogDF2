@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:divelogtest/models/user_profile.dart';
 import 'package:divelogtest/services/user_service.dart';
+import 'package:divelogtest/services/firebase_storage_service.dart';
 import 'package:divelogtest/auth/firebase_auth_manager.dart';
 import 'package:divelogtest/theme.dart';
 import 'package:logging/logging.dart';
@@ -26,7 +29,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late final FirebaseAuthManager _authManager;
   UserProfile? _userProfile;
   bool _isLoading = true;
+  bool _isUploadingPhoto = false;
   User? _currentFirebaseUser;
+  final ImagePicker _imagePicker = ImagePicker();
+  final FirebaseStorageService _storageService = FirebaseStorageService();
 
   Future<void> _handleLogout() async {
     try {
@@ -47,6 +53,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _pickAndUploadImage(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _imagePicker.pickImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
+
+      if (pickedFile == null || _currentFirebaseUser == null) return;
+
+      setState(() => _isUploadingPhoto = true);
+
+      final File imageFile = File(pickedFile.path);
+      final downloadUrl = await _storageService.uploadProfilePhoto(
+        imageFile,
+        _currentFirebaseUser!.uid,
+      );
+
+      if (downloadUrl != null) {
+        await _userService.updateUserProfile(photoUrl: downloadUrl);
+        await _loadUserProfile();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Foto de perfil actualizada')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error al subir la foto')),
+          );
+        }
+      }
+    } catch (e) {
+      _log.severe('Error in _pickAndUploadImage', e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al procesar la imagen: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploadingPhoto = false);
+      }
+    }
+  }
+
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Tomar foto'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Elegir de galería'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showEditProfileDialog() {
     if (_userProfile == null) return;
 
@@ -56,6 +139,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         TextEditingController(text: _userProfile!.certificationLevel);
     final certNumberController =
         TextEditingController(text: _userProfile!.certificationNumber);
+    final bloodTypeController =
+        TextEditingController(text: _userProfile!.bloodType);
+    final emergencyContactController =
+        TextEditingController(text: _userProfile!.emergencyContact);
 
     showDialog(
       context: context,
@@ -87,6 +174,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration:
                     const InputDecoration(labelText: 'Número Certificación'),
               ),
+              const SizedBox(height: 8),
+              const SizedBox(height: 8),
+              TextField(
+                controller: bloodTypeController,
+                decoration: const InputDecoration(labelText: 'Tipo de Sangre'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: emergencyContactController,
+                decoration:
+                    const InputDecoration(labelText: 'Contacto de Emergencia'),
+                maxLines: 2,
+              ),
             ],
           ),
         ),
@@ -101,6 +201,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 name: nameController.text,
                 certificationLevel: certLevelController.text,
                 certificationNumber: certNumberController.text,
+                bloodType: bloodTypeController.text.isEmpty
+                    ? null
+                    : bloodTypeController.text,
+                emergencyContact: emergencyContactController.text.isEmpty
+                    ? null
+                    : emergencyContactController.text,
               );
               if (mounted) {
                 Navigator.pop(context);
@@ -196,29 +302,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: Column(
                           children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 4,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  _userProfile?.name
-                                          .substring(0, 1)
-                                          .toUpperCase() ??
-                                      'D',
-                                  style:
-                                      theme.textTheme.displayMedium?.copyWith(
-                                    color: colorScheme.primary,
-                                    fontWeight: FontWeight.bold,
+                            GestureDetector(
+                              onTap: _showImageSourceDialog,
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 4,
+                                      ),
+                                      image: _userProfile?.photoUrl != null &&
+                                              _userProfile!.photoUrl!.isNotEmpty
+                                          ? DecorationImage(
+                                              image: NetworkImage(
+                                                  _userProfile!.photoUrl!),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : null,
+                                    ),
+                                    child: _userProfile?.photoUrl != null &&
+                                            _userProfile!.photoUrl!.isNotEmpty
+                                        ? null
+                                        : Center(
+                                            child: Text(
+                                              _userProfile?.name
+                                                      .substring(0, 1)
+                                                      .toUpperCase() ??
+                                                  'D',
+                                              style: theme
+                                                  .textTheme.displayMedium
+                                                  ?.copyWith(
+                                                color: colorScheme.primary,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
                                   ),
-                                ),
+                                  if (_isUploadingPhoto)
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.black45,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.secondary,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: const Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -298,9 +457,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 8),
                             _InfoCard(
                               icon: Icons.badge,
-                              label: 'Certificación',
+                              label: 'Nivel de Certificación',
                               value: _userProfile?.certificationLevel ??
                                   'No especificada',
+                            ),
+                            const SizedBox(height: 8),
+                            _InfoCard(
+                              icon: Icons.numbers,
+                              label: 'Número Certificación',
+                              value: _userProfile?.certificationNumber ??
+                                  'No especificado',
+                            ),
+                            const SizedBox(height: 8),
+                            _InfoCard(
+                              icon: Icons.bloodtype,
+                              label: 'Tipo de Sangre',
+                              value:
+                                  _userProfile?.bloodType ?? 'No especificado',
+                            ),
+                            const SizedBox(height: 8),
+                            _InfoCard(
+                              icon: Icons.contact_emergency,
+                              label: 'Contacto de Emergencia',
+                              value: _userProfile?.emergencyContact ??
+                                  'No especificado',
                             ),
                           ],
                         ),

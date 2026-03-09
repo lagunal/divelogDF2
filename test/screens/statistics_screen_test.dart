@@ -26,22 +26,30 @@ class MockUserService implements UserService {
   Future<UserProfile?> getUserProfile() async => null;
 
   @override
-  Future<UserProfile> createUserProfile(
-      {required String name,
-      required String email,
-      String? certificationLevel,
-      String? certificationNumber,
-      DateTime? certificationDate}) async {
+  Future<UserProfile> createUserProfile({
+    required String name,
+    required String email,
+    String? certificationLevel,
+    String? certificationNumber,
+    DateTime? certificationDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
+  }) async {
     throw UnimplementedError();
   }
 
   @override
-  Future<UserProfile> updateUserProfile(
-      {String? name,
-      String? email,
-      String? certificationLevel,
-      String? certificationNumber,
-      DateTime? certificationDate}) async {
+  Future<UserProfile> updateUserProfile({
+    String? name,
+    String? email,
+    String? certificationLevel,
+    String? certificationNumber,
+    DateTime? certificationDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
+  }) async {
     throw UnimplementedError();
   }
 

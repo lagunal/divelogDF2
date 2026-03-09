@@ -129,6 +129,9 @@ class UserService {
     String? certificationLevel,
     String? certificationNumber,
     DateTime? certificationDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
   }) async {
     await initialize();
 
@@ -140,6 +143,9 @@ class UserService {
       certificationLevel: certificationLevel,
       certificationNumber: certificationNumber,
       certificationDate: certificationDate,
+      photoUrl: photoUrl,
+      bloodType: bloodType,
+      emergencyContact: emergencyContact,
       totalDives: 0,
       totalBottomTime: 0.0,
       deepestDive: 0.0,
@@ -166,6 +172,9 @@ class UserService {
     String? certificationLevel,
     String? certificationNumber,
     DateTime? certificationDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
   }) async {
     await initialize();
 
@@ -179,6 +188,9 @@ class UserService {
       certificationLevel: certificationLevel,
       certificationNumber: certificationNumber,
       certificationDate: certificationDate,
+      photoUrl: photoUrl,
+      bloodType: bloodType,
+      emergencyContact: emergencyContact,
       updatedAt: DateTime.now(),
     );
 

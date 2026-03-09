@@ -124,6 +124,9 @@ class MockUserService implements UserService {
     String? certificationLevel,
     String? certificationNumber,
     DateTime? certificationDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
   }) async {
     return UserProfile(
       id: 'test_user_id',
@@ -147,6 +150,9 @@ class MockUserService implements UserService {
     String? certificationLevel,
     String? certificationNumber,
     DateTime? certificationDate,
+    String? photoUrl,
+    String? bloodType,
+    String? emergencyContact,
   }) async {
     return UserProfile(
       id: 'test_user_id',
