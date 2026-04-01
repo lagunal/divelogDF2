@@ -285,22 +285,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   },
                 ),
                 const Divider(height: 32),
-                _DrawerItem(
-                  icon: Icons.settings,
-                  title: 'Configuración',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to settings screen
-                  },
-                ),
-                _DrawerItem(
-                  icon: Icons.help_outline,
-                  title: 'Ayuda',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to help screen
-                  },
-                ),
+                // _DrawerItem(
+                //   icon: Icons.settings,
+                //   title: 'Configuración',
+                //   onTap: () {
+                //     Navigator.pop(context);
+                //     // TODO: Navigate to settings screen
+                //   },
+                // ),
+                // _DrawerItem(
+                //   icon: Icons.help_outline,
+                //   title: 'Ayuda',
+                //   onTap: () {
+                //     Navigator.pop(context);
+                //     // TODO: Navigate to help screen
+                //   },
+                // ),
                 _DrawerItem(
                   icon: Icons.info_outline,
                   title: 'Acerca de',
@@ -372,7 +372,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              '© 2024 Registro de Buceo',
+              '© 2025 Registro de Buceo',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

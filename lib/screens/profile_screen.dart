@@ -224,16 +224,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showAboutDialog() {
-    showAboutDialog(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    showDialog(
       context: context,
-      applicationName: 'Dive Log App',
-      applicationVersion: '1.0.0',
-      applicationLegalese: '© 2025 Dive Log App',
-      children: [
-        const SizedBox(height: 16),
-        const Text(
-            'Una aplicación profesional para registrar y gestionar tus inmersiones de buceo.'),
-      ],
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.scuba_diving, color: colorScheme.primary, size: 28),
+            const SizedBox(width: 12),
+            const Text('Acerca de'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Registro de Buceo',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Versión 1.0.0',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Una aplicación profesional para registrar y gestionar tus sesiones de buceo. Mantén un registro detallado de todas tus inmersiones, equipos, condiciones del agua y más.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '© 2025 Registro de Buceo',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
     );
   }
 
