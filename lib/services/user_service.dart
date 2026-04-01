@@ -195,6 +195,26 @@ class UserService {
     );
 
     await _saveToStorage();
+
+    // Try to save to Firestore (but don't fail if offline)
+    try {
+      if (_currentUser!.id != 'default-user') {
+        await _firestoreUserService.createOrUpdateUserProfile(
+          userId: _currentUser!.id,
+          name: _currentUser!.name,
+          email: _currentUser!.email,
+          certificationLevel: _currentUser!.certificationLevel,
+          certificationNumber: _currentUser!.certificationNumber,
+          certificationDate: _currentUser!.certificationDate,
+          photoUrl: _currentUser!.photoUrl,
+          bloodType: _currentUser!.bloodType,
+          emergencyContact: _currentUser!.emergencyContact,
+        );
+      }
+    } catch (e) {
+      _log.warning('Could not save profile update to Firestore (offline?)', e);
+    }
+
     return _currentUser!;
   }
 

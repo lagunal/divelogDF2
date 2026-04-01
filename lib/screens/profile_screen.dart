@@ -6,8 +6,11 @@ import 'package:divelogtest/models/user_profile.dart';
 import 'package:divelogtest/services/user_service.dart';
 import 'package:divelogtest/services/firebase_storage_service.dart';
 import 'package:divelogtest/auth/firebase_auth_manager.dart';
+import 'package:divelogtest/screens/privacy_policy_screen.dart';
 import 'package:divelogtest/theme.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
+import 'package:divelogtest/providers/dive_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserService? userService;
@@ -275,6 +278,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final diveProvider = Provider.of<DiveProvider>(context);
+    final stats = diveProvider.statistics;
+    final totalDives = stats['totalDives'] ?? _userProfile?.totalDives ?? 0;
+    final totalBottomTime = stats['totalBottomTime'] ?? _userProfile?.totalBottomTime ?? 0;
 
     return Scaffold(
       body: SafeArea(
@@ -409,7 +416,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               child: _StatCard(
                                 icon: Icons.water,
-                                value: '${_userProfile?.totalDives ?? 0}',
+                                value: '$totalDives',
                                 label: 'Inmersiones',
                                 color: colorScheme.primary,
                               ),
@@ -418,7 +425,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               child: _StatCard(
                                 icon: Icons.schedule,
-                                value: '${_userProfile?.totalBottomTime ?? 0}m',
+                                value: '${totalBottomTime}m',
                                 label: 'Tiempo Total',
                                 color: colorScheme.secondary,
                               ),
@@ -507,6 +514,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               title: 'Editar Perfil',
                               onTap: _showEditProfileDialog,
                             ),
+                            /*
                             _SettingsItem(
                               icon: Icons.notifications,
                               title: 'Notificaciones',
@@ -516,15 +524,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 );
                               },
                             ),
+                            */
                             _SettingsItem(
                               icon: Icons.privacy_tip,
                               title: 'Privacidad',
                               onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Próximamente')),
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const PrivacyPolicyScreen(),
+                                  ),
                                 );
                               },
                             ),
+                            /*
                             _SettingsItem(
                               icon: Icons.help,
                               title: 'Ayuda y Soporte',
@@ -534,6 +547,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 );
                               },
                             ),
+                            */
                             _SettingsItem(
                               icon: Icons.info,
                               title: 'Acerca de',
