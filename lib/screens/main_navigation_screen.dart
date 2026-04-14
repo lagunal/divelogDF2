@@ -9,6 +9,7 @@ import 'package:divelogtest/providers/dive_provider.dart';
 import 'package:divelogtest/services/user_service.dart';
 import 'package:divelogtest/models/user_profile.dart';
 import 'package:divelogtest/widgets/sync_status_indicator.dart';
+import 'package:divelogtest/widgets/custom_about_dialog.dart';
 import 'package:logging/logging.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -109,12 +110,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         actions: [
           const SyncStatusIndicator(),
           const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO: Implement search functionality
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.search),
+          //   onPressed: () {
+          //     // TODO: Implement search functionality
+          //   },
+          // ),
         ],
       ),
       body: Column(
@@ -162,7 +163,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   String _getAppBarTitle() {
     switch (_currentIndex) {
       case 0:
-        return 'Registro de Buceo';
+        return 'Dive Log';
       case 1:
         return 'Mis Inmersiones';
       case 2:
@@ -170,7 +171,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       case 3:
         return 'Perfil';
       default:
-        return 'Registro de Buceo';
+        return 'Dive Log';
     }
   }
 
@@ -306,7 +307,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   title: 'Acerca de',
                   onTap: () {
                     Navigator.pop(context);
-                    _showAboutDialog(context);
+                    showCustomAboutDialog(context);
                   },
                 ),
               ],
@@ -328,61 +329,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAboutDialog(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.scuba_diving, color: colorScheme.primary, size: 28),
-            const SizedBox(width: 12),
-            const Text('Acerca de'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Registro de Buceo',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Versión 1.0.0',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Una aplicación profesional para registrar y gestionar tus sesiones de buceo. Mantén un registro detallado de todas tus inmersiones, equipos, condiciones del agua y más.',
-              style: theme.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '© 2025 Registro de Buceo',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
           ),
         ],
       ),

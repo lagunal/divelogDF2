@@ -7,6 +7,7 @@ import 'package:divelogtest/services/user_service.dart';
 import 'package:divelogtest/services/firebase_storage_service.dart';
 import 'package:divelogtest/auth/firebase_auth_manager.dart';
 import 'package:divelogtest/screens/privacy_policy_screen.dart';
+import 'package:divelogtest/widgets/custom_about_dialog.dart';
 import 'package:divelogtest/theme.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -223,60 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showAboutDialog() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.scuba_diving, color: colorScheme.primary, size: 28),
-            const SizedBox(width: 12),
-            const Text('Acerca de'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Registro de Buceo',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Versión 1.0.0',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Una aplicación profesional para registrar y gestionar tus sesiones de buceo. Mantén un registro detallado de todas tus inmersiones, equipos, condiciones del agua y más.',
-              style: theme.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '© 2025 Registro de Buceo',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   void initState() {
@@ -592,7 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _SettingsItem(
                               icon: Icons.info,
                               title: 'Acerca de',
-                              onTap: _showAboutDialog,
+                              onTap: () => showCustomAboutDialog(context),
                             ),
                             const SizedBox(height: 8),
                             _SettingsItem(
