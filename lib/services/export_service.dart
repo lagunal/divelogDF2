@@ -53,7 +53,7 @@ class ExportService {
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
-          pw.Text('Bitácora de Buceo',
+          pw.Text('Historial de Buceo / Supervisión',
               style:
                   pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
           pw.Text(_dateFormat.format(dive.horaEntrada),
@@ -153,12 +153,12 @@ class ExportService {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text('Trabajo y Seguridad',
+          pw.Text('Descripción del Trabajo ',
               style:
                   pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
           pw.Divider(),
-          _buildRow('Descripción', dive.descripcionTrabajo),
-          _buildRow('Descompresión', dive.descompresionUtilizada),
+          _buildRow('Descripción/equipo/herramienta', dive.descripcionTrabajo),
+          _buildRow('Descompresión utilizada', dive.descompresionUtilizada),
           if (dive.enfermedadLesion != null &&
               dive.enfermedadLesion!.isNotEmpty)
             _buildRow('Enfermedad/Lesión', dive.enfermedadLesion!),
