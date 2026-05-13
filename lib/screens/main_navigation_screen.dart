@@ -163,7 +163,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   String _getAppBarTitle() {
     switch (_currentIndex) {
       case 0:
-        return 'Dive Log';
+        return 'Bitácora de Buceo';
       case 1:
         return 'Mis Inmersiones';
       case 2:

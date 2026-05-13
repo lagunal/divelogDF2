@@ -19,7 +19,7 @@ void showCustomAboutDialog(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Dive Log',
+            'Bitácora de Buceo',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -38,7 +38,7 @@ void showCustomAboutDialog(BuildContext context) {
           ),
           const SizedBox(height: 16),
           Text(
-            '© 2025 Dive Log',
+            '© 2026 Bitácora de Buceo',
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

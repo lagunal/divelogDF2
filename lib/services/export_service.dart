@@ -203,7 +203,7 @@ class ExportService {
           ],
         ),
         pw.SizedBox(height: 20),
-        pw.Text('Generado por Dive Log App',
+        pw.Text('Generado por Bitácora de Buceo - App',
             style: const pw.TextStyle(color: PdfColors.grey, fontSize: 10)),
       ],
     );
