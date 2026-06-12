@@ -8,6 +8,7 @@ import 'package:divelogtest/services/export_service.dart';
 import 'package:divelogtest/theme.dart';
 import 'package:divelogtest/widgets/custom_text_field.dart';
 import 'package:divelogtest/utils/validators.dart';
+import 'package:divelogtest/screens/paywall_screen.dart';
 import 'package:logging/logging.dart';
 
 class AddEditDiveScreen extends StatefulWidget {
@@ -306,6 +307,16 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
               tooltip: 'Exportar',
               onSelected: (value) async {
                 if (widget.existingDive == null) return;
+
+                final isPremium = context.read<DiveProvider>().isPremium;
+                if (!isPremium) {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const PaywallScreen()),
+                  );
+                  // If they didn't purchase or restore successfully, don't proceed
+                  if (result != true) return;
+                }
 
                 setState(() => _isLoading = true);
                 try {

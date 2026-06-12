@@ -49,6 +49,7 @@ class MockUserService implements UserService {
     String? photoUrl,
     String? bloodType,
     String? emergencyContact,
+    bool? isPremium,
   }) async {
     throw UnimplementedError();
   }
@@ -138,6 +139,9 @@ class MockDiveProviderWithStats extends ChangeNotifier implements DiveProvider {
 
   @override
   UserProfile? get userProfile => null;
+
+  @override
+  bool get isPremium => false;
 
   @override
   void clear() {}
@@ -258,6 +262,9 @@ class MockDiveProviderEmptyStats extends ChangeNotifier
 
   @override
   UserProfile? get userProfile => null;
+
+  @override
+  bool get isPremium => false;
 
   @override
   void clear() {}

@@ -13,6 +13,7 @@ class UserProfile {
   final String? photoUrl;
   final String? bloodType;
   final String? emergencyContact;
+  final bool isPremium;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -29,6 +30,7 @@ class UserProfile {
     this.photoUrl,
     this.bloodType,
     this.emergencyContact,
+    this.isPremium = false,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -46,6 +48,7 @@ class UserProfile {
         'photoUrl': photoUrl,
         'bloodType': bloodType,
         'emergencyContact': emergencyContact,
+        'isPremium': isPremium,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
       };
@@ -62,9 +65,9 @@ class UserProfile {
         'totalDives': totalDives,
         'totalBottomTime': totalBottomTime,
         'deepestDive': deepestDive,
-        'photoUrl': photoUrl,
         'bloodType': bloodType,
         'emergencyContact': emergencyContact,
+        'isPremium': isPremium,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': Timestamp.fromDate(updatedAt),
       };
@@ -84,6 +87,7 @@ class UserProfile {
         photoUrl: json['photoUrl'] as String?,
         bloodType: json['bloodType'] as String?,
         emergencyContact: json['emergencyContact'] as String?,
+        isPremium: json['isPremium'] == 1 || json['isPremium'] == true,
         createdAt: DateTime.parse(json['createdAt'] as String),
         updatedAt: DateTime.parse(json['updatedAt'] as String),
       );
@@ -103,6 +107,7 @@ class UserProfile {
         photoUrl: data['photoUrl'] as String?,
         bloodType: data['bloodType'] as String?,
         emergencyContact: data['emergencyContact'] as String?,
+        isPremium: data['isPremium'] as bool? ?? false,
         createdAt: (data['createdAt'] as Timestamp).toDate(),
         updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       );
@@ -120,6 +125,7 @@ class UserProfile {
     String? photoUrl,
     String? bloodType,
     String? emergencyContact,
+    bool? isPremium,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) =>
@@ -136,6 +142,7 @@ class UserProfile {
         photoUrl: photoUrl ?? this.photoUrl,
         bloodType: bloodType ?? this.bloodType,
         emergencyContact: emergencyContact ?? this.emergencyContact,
+        isPremium: isPremium ?? this.isPremium,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );

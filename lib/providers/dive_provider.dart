@@ -26,6 +26,7 @@ class DiveProvider extends ChangeNotifier {
   List<DiveSession> get recentDives => _allDives.take(3).toList();
   Map<String, dynamic> get statistics => Map.unmodifiable(_statistics);
   UserProfile? get userProfile => _userProfile; // Added getter
+  bool get isPremium => _userProfile?.isPremium ?? false;
 
   bool get isLoading => _isLoading;
   String? get error => _error;

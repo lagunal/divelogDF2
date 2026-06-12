@@ -75,6 +75,9 @@ class MockDiveProviderWithDives extends ChangeNotifier implements DiveProvider {
   UserProfile? get userProfile => null;
 
   @override
+  bool get isPremium => false;
+
+  @override
   void clear() {}
 
   @override
@@ -186,6 +189,9 @@ class MockDiveProviderEmpty extends ChangeNotifier implements DiveProvider {
 
   @override
   UserProfile? get userProfile => null;
+
+  @override
+  bool get isPremium => false;
 
   @override
   void clear() {}

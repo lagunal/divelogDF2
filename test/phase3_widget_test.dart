@@ -79,6 +79,9 @@ class FakeDiveProvider extends ChangeNotifier implements DiveProvider {
   UserProfile? get userProfile => null;
 
   @override
+  bool get isPremium => false;
+
+  @override
   void clear() {}
 
   @override
@@ -153,6 +156,7 @@ class MockUserService implements UserService {
     String? photoUrl,
     String? bloodType,
     String? emergencyContact,
+    bool? isPremium,
   }) async {
     return UserProfile(
       id: 'test_user_id',

@@ -175,6 +175,7 @@ class UserService {
     String? photoUrl,
     String? bloodType,
     String? emergencyContact,
+    bool? isPremium,
   }) async {
     await initialize();
 
@@ -191,6 +192,7 @@ class UserService {
       photoUrl: photoUrl,
       bloodType: bloodType,
       emergencyContact: emergencyContact,
+      isPremium: isPremium,
       updatedAt: DateTime.now(),
     );
 

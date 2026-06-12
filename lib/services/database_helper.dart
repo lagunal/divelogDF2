@@ -26,7 +26,7 @@ class DatabaseHelper {
 
       return openDatabase(
         path,
-        version: 4,
+        version: 5,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       );
@@ -92,6 +92,7 @@ class DatabaseHelper {
           photoUrl TEXT,
           bloodType TEXT,
           emergencyContact TEXT,
+          isPremium INTEGER DEFAULT 0,
           createdAt TEXT NOT NULL,
           updatedAt TEXT NOT NULL
         )
@@ -140,6 +141,15 @@ class DatabaseHelper {
             'Error upgrading database to v4 (columns may already exist)', e);
       }
     }
+
+    if (oldVersion < 5) {
+      try {
+        await db.execute('ALTER TABLE user_profiles ADD COLUMN isPremium INTEGER DEFAULT 0');
+        _log.info('Database upgraded to v5: added isPremium column');
+      } catch (e) {
+        _log.warning('Error upgrading database to v5 (column may already exist)', e);
+      }
+    }
   }
 
   Map<String, dynamic> _prepareDataForInsert(Map<String, dynamic> data) {
@@ -148,6 +158,9 @@ class DatabaseHelper {
       if (value is List) {
         // Serialize List to JSON String for TEXT columns (e.g. nombreBuzos)
         preparedData[key] = jsonEncode(value);
+      } else if (value is bool) {
+        // SQLite doesn't have a boolean type, store as INTEGER (0 or 1)
+        preparedData[key] = value ? 1 : 0;
       }
     });
     return preparedData;

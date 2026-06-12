@@ -12,6 +12,7 @@ import 'package:divelogtest/theme.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:divelogtest/providers/dive_provider.dart';
+import 'package:divelogtest/screens/paywall_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserService? userService;
@@ -268,6 +269,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final diveProvider = Provider.of<DiveProvider>(context);
+    final isPremium = diveProvider.isPremium;
     final stats = diveProvider.statistics;
     final totalDives = stats['totalDives'] ?? _userProfile?.totalDives ?? 0;
     final totalBottomTime = stats['totalBottomTime'] ?? _userProfile?.totalBottomTime ?? 0;
@@ -484,6 +486,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                       const SizedBox(height: 24),
 
+                      // Premium Banner
+                      _buildPremiumBanner(context, isPremium),
+
+                      const SizedBox(height: 24),
+
                       // Settings Section
                       Padding(
                         padding: AppSpacing.horizontalLg,
@@ -558,6 +565,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumBanner(BuildContext context, bool isPremium) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    if (isPremium) {
+      return Padding(
+        padding: AppSpacing.horizontalLg,
+        child: Container(
+          padding: AppSpacing.paddingMd,
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.star, color: colorScheme.primary),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Cuenta Premium Activa',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: AppSpacing.horizontalLg,
+      child: InkWell(
+        onTap: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const PaywallScreen()),
+          );
+          if (result == true) {
+            _loadUserProfile(); // Reload to get updated premium status
+            context.read<DiveProvider>().refreshData(_userService.getCurrentUserId() ?? '');
+          }
+        },
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        child: Container(
+          padding: AppSpacing.paddingMd,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [colorScheme.primary, colorScheme.secondary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.diamond_outlined, color: Colors.white, size: 28),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Actualizar a Premium',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Desbloquea exportación a PDF/CSV y más',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.white),
+            ],
+          ),
+        ),
       ),
     );
   }

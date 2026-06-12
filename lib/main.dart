@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:divelogtest/firebase_options.dart';
 import 'package:flutter/foundation.dart';
-import 'package:divelogtest/config/stripe_config.dart';
+import 'package:divelogtest/services/subscription_service.dart';
 import 'package:divelogtest/screens/auth_wrapper.dart';
 import 'package:divelogtest/theme.dart';
 import 'package:divelogtest/providers/dive_provider.dart';
@@ -40,11 +39,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize Stripe
-  Stripe.publishableKey = StripeConfig.publishableKey;
-  if (!kIsWeb) {
-    await Stripe.instance.applySettings();
-  }
+  // Initialize RevenueCat
+  await SubscriptionService().initialize();
 
   // Run the app
   runApp(const MyApp());
