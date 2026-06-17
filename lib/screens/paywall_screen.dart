@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:divelogtest/providers/dive_provider.dart';
 import 'package:divelogtest/services/subscription_service.dart';
 import 'package:divelogtest/theme.dart';
 
@@ -38,6 +40,8 @@ class _PaywallScreenState extends State<PaywallScreen> {
     if (mounted) {
       setState(() => _isLoading = false);
       if (isPremium) {
+        await context.read<DiveProvider>().refreshUserProfile();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('¡Gracias por actualizar a Premium!')),
         );
@@ -58,6 +62,8 @@ class _PaywallScreenState extends State<PaywallScreen> {
     if (mounted) {
       setState(() => _isLoading = false);
       if (isPremium) {
+        await context.read<DiveProvider>().refreshUserProfile();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('¡Compras restauradas con éxito!')),
         );

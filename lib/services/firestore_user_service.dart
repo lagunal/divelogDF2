@@ -26,6 +26,7 @@ class FirestoreUserService {
     String? photoUrl,
     String? bloodType,
     String? emergencyContact,
+    bool? isPremium,
   }) async {
     try {
       final doc = await _usersCollection.doc(userId).get();
@@ -39,7 +40,8 @@ class FirestoreUserService {
               certificationDate,
               photoUrl,
               bloodType,
-              emergencyContact)
+              emergencyContact,
+              isPremium)
           : _createNewProfile(
               userId,
               name,
@@ -49,7 +51,8 @@ class FirestoreUserService {
               certificationDate,
               photoUrl,
               bloodType,
-              emergencyContact);
+              emergencyContact,
+              isPremium);
 
       await _usersCollection.doc(userId).set(profile.toFirestore());
       _log.info('User profile saved to Firestore: $userId');
@@ -70,6 +73,7 @@ class FirestoreUserService {
     String? photoUrl,
     String? bloodType,
     String? emergencyContact,
+    bool? isPremium,
   ) {
     final existing = UserProfile.fromFirestore(doc.data()!);
     return existing.copyWith(
@@ -81,6 +85,7 @@ class FirestoreUserService {
       photoUrl: photoUrl ?? existing.photoUrl,
       bloodType: bloodType ?? existing.bloodType,
       emergencyContact: emergencyContact ?? existing.emergencyContact,
+      isPremium: isPremium ?? existing.isPremium,
       updatedAt: DateTime.now(),
     );
   }
@@ -95,6 +100,7 @@ class FirestoreUserService {
     String? photoUrl,
     String? bloodType,
     String? emergencyContact,
+    bool? isPremium,
   ) {
     final now = DateTime.now();
     return UserProfile(
@@ -107,6 +113,7 @@ class FirestoreUserService {
       photoUrl: photoUrl,
       bloodType: bloodType,
       emergencyContact: emergencyContact,
+      isPremium: isPremium ?? false,
       totalDives: 0,
       totalBottomTime: 0.0,
       deepestDive: 0.0,

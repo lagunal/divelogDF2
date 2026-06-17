@@ -87,6 +87,7 @@ class UserService {
         userId: firebaseUser.uid,
         name: _currentUser!.name,
         email: _currentUser!.email,
+        isPremium: _currentUser!.isPremium,
       );
     } catch (e) {
       _log.warning('Could not save to Firestore (offline?)', e);
@@ -211,6 +212,7 @@ class UserService {
           photoUrl: _currentUser!.photoUrl,
           bloodType: _currentUser!.bloodType,
           emergencyContact: _currentUser!.emergencyContact,
+          isPremium: _currentUser!.isPremium,
         );
       }
     } catch (e) {

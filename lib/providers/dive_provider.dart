@@ -107,6 +107,14 @@ class DiveProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshUserProfile() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      _userProfile = await _userService.getUserProfile(userId);
+      notifyListeners();
+    }
+  }
+
   Future<void> createDive(DiveSession session) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) throw Exception('User not authenticated');
