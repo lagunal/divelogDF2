@@ -1,4 +1,4 @@
-package com.divelog.app
+package com.flnglobalgroup.divedatapro.app
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

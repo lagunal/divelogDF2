@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
       create: (_) => DiveProvider(),
       child: ErrorBoundary(
         child: MaterialApp(
-          title: 'Registro de Buceo',
+          title: 'DiveDataPro',
           debugShowCheckedModeBanner: false,
           theme: lightTheme,
           darkTheme: darkTheme,

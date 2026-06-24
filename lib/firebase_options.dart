@@ -47,29 +47,28 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCiSzbJjULTd6dDMnk1RPA2we1_1gclAPc',
-    appId: '1:448729098612:web:6692c5a85861df9f01e421',
-    messagingSenderId: '448729098612',
-    projectId: 'lmhezq2u3og1a9fif4vfxxhpmdp6e1',
-    authDomain: 'lmhezq2u3og1a9fif4vfxxhpmdp6e1.firebaseapp.com',
-    storageBucket: 'lmhezq2u3og1a9fif4vfxxhpmdp6e1.firebasestorage.app',
+    apiKey: 'AIzaSyBaL_AsYzNYWan58pdeofpqIrkYXIYw4IU',
+    appId: '1:989282375030:web:a6e0e450b94673b3ce9657',
+    messagingSenderId: '989282375030',
+    projectId: 'divedatapro',
+    authDomain: 'divedatapro.firebaseapp.com',
+    storageBucket: 'divedatapro.firebasestorage.app',
+    measurementId: 'G-J9TV4ZCBDE',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBnGIJtuNvqsQTuUWHlLPk8S36iKmjwG9Q',
-    appId: '1:448729098612:android:9b9abd9bac56eff501e421',
-    messagingSenderId: '448729098612',
-    projectId: 'lmhezq2u3og1a9fif4vfxxhpmdp6e1',
-    storageBucket: 'lmhezq2u3og1a9fif4vfxxhpmdp6e1.firebasestorage.app',
+    apiKey: 'AIzaSyDGK6V6dI8v1ezFtXRYZ3xeUWrJgfGHFHI',
+    appId: '1:989282375030:android:a509cfb50e4b1c92ce9657',
+    messagingSenderId: '989282375030',
+    projectId: 'divedatapro',
+    storageBucket: 'divedatapro.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAJNBQnENepLRLRth6GQT-aBCdQopIbamI',
-    appId: '1:448729098612:ios:f192418e2fcf533f01e421',
-    messagingSenderId: '448729098612',
-    projectId: 'lmhezq2u3og1a9fif4vfxxhpmdp6e1',
-    storageBucket: 'lmhezq2u3og1a9fif4vfxxhpmdp6e1.firebasestorage.app',
-    iosBundleId: 'com.divelog.app',
+    apiKey: 'AIzaSyAGriUHqxg6HZUeRWyULVd9HtKZ559gd2A',
+    appId: '1:989282375030:ios:f59b87bad6ccb505ce9657',
+    messagingSenderId: '989282375030',
+    projectId: 'divedatapro',
+    storageBucket: 'divedatapro.firebasestorage.app',
+    iosBundleId: 'com.flnglobalgroup.divedatapro.app',
   );
-
 }

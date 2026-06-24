@@ -69,6 +69,8 @@ class MockUserService implements UserService {
 // Mock DiveProvider with statistics data
 class MockDiveProviderWithStats extends ChangeNotifier implements DiveProvider {
   @override
+  Future<void> refreshUserProfile() async {}
+  @override
   List<DiveSession> get allDives => _createMockDives();
 
   @override
@@ -195,6 +197,8 @@ class MockDiveProviderWithStats extends ChangeNotifier implements DiveProvider {
 // Mock DiveProvider with no data (empty state)
 class MockDiveProviderEmptyStats extends ChangeNotifier
     implements DiveProvider {
+  @override
+  Future<void> refreshUserProfile() async {}
   @override
   List<DiveSession> get allDives => [];
 

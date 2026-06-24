@@ -163,7 +163,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   String _getAppBarTitle() {
     switch (_currentIndex) {
       case 0:
-        return 'Bitácora de Buceo';
+        return 'DiveDataPro';
       case 1:
         return 'Mis Inmersiones';
       case 2:
@@ -322,7 +322,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 const Divider(),
                 const SizedBox(height: 8),
                 Text(
-                  'Registro de Buceo v1.0.0',
+                  'DiveDataPro v1.0.0',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

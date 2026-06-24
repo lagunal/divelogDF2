@@ -14,6 +14,8 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 // Mocks
 class FakeDiveProvider extends ChangeNotifier implements DiveProvider {
   @override
+  Future<void> refreshUserProfile() async {}
+  @override
   List<DiveSession> get allDives => [];
 
   @override

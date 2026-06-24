@@ -10,6 +10,8 @@ import 'package:divelogtest/services/dive_service.dart';
 // Mock DiveProvider with sample data
 class MockDiveProviderWithDives extends ChangeNotifier implements DiveProvider {
   @override
+  Future<void> refreshUserProfile() async {}
+  @override
   List<DiveSession> get allDives => _createMockDives();
 
   @override
@@ -125,6 +127,8 @@ class MockDiveProviderWithDives extends ChangeNotifier implements DiveProvider {
 
 // Mock DiveProvider with no dives (empty state)
 class MockDiveProviderEmpty extends ChangeNotifier implements DiveProvider {
+  @override
+  Future<void> refreshUserProfile() async {}
   @override
   List<DiveSession> get allDives => [];
 

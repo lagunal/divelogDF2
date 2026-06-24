@@ -17,7 +17,7 @@ class SubscriptionService {
   // and paste the API key starting with 'test_' here.
   // IMPORTANT: Clear this out before releasing to production!
   static const String _testApiKey =
-      'test_GYbldQqhaBvcumCDHlxJTZoECmn'; // e.g., 'test_...'
+      'test_soYglhdJFvXGTSpNfDajqHQiZFx'; // e.g., 'test_...'
 
   static const String _appleApiKey = 'YOUR_APPLE_API_KEY';
   static const String _googleApiKey = 'YOUR_GOOGLE_API_KEY';

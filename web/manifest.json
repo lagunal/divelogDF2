@@ -1,6 +1,6 @@
 {
-    "name": "divelogtest",
-    "short_name": "divelogtest",
+    "name": "DiveDataPro",
+    "short_name": "DiveDataPro",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
