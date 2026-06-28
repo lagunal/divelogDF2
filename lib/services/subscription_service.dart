@@ -16,11 +16,10 @@ class SubscriptionService {
   // For Test Store: Create a Test Store in RevenueCat Dashboard -> Apps and Providers
   // and paste the API key starting with 'test_' here.
   // IMPORTANT: Clear this out before releasing to production!
-  static const String _testApiKey =
-      'test_soYglhdJFvXGTSpNfDajqHQiZFx'; // e.g., 'test_...'
+  static const String _testApiKey = ''; // e.g., 'test_...'
 
   static const String _appleApiKey = 'YOUR_APPLE_API_KEY';
-  static const String _googleApiKey = 'YOUR_GOOGLE_API_KEY';
+  static const String _googleApiKey = 'goog_YHMzrlNhuWqAKzfCqjEAWDWmjea';
   static const String _entitlementId = 'premium';
 
   bool _isInitialized = false;
