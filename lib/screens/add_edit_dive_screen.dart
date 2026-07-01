@@ -286,6 +286,10 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
     if (difference > 0) {
       // Set the calculated value, but user can still edit the TextField
       _tiempoFondoController.text = difference.toString();
+    } else {
+      _showErrorSnackBar(
+          'La hora de salida debe ser mayor a la hora de entrada');
+      _tiempoFondoController.text = '';
     }
   }
 
@@ -320,7 +324,8 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
                 if (!isPremium) {
                   final result = await Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const PaywallScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const PaywallScreen()),
                   );
                   // If they didn't purchase or restore successfully, don't proceed
                   if (result != true) return;
