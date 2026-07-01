@@ -281,6 +281,14 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
     );
   }
 
+  void _calculateBottomTime() {
+    final difference = _horaSalida.difference(_horaEntrada).inMinutes;
+    if (difference > 0) {
+      // Set the calculated value, but user can still edit the TextField
+      _tiempoFondoController.text = difference.toString();
+    }
+  }
+
   void _showErrorSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context)
@@ -605,7 +613,10 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           icon: Icons.login,
           value: _horaEntrada,
           onTap: () => _selectDateTime(context, _horaEntrada, (date) {
-            setState(() => _horaEntrada = date);
+            setState(() {
+              _horaEntrada = date;
+              _calculateBottomTime();
+            });
           }),
           dateFormat: dateFormat,
         ),
@@ -615,7 +626,10 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           icon: Icons.logout,
           value: _horaSalida,
           onTap: () => _selectDateTime(context, _horaSalida, (date) {
-            setState(() => _horaSalida = date);
+            setState(() {
+              _horaSalida = date;
+              _calculateBottomTime();
+            });
           }),
           dateFormat: dateFormat,
         ),
