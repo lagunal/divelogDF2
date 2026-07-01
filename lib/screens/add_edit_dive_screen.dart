@@ -281,6 +281,18 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
     );
   }
 
+  void _calculateBottomTime() {
+    final difference = _horaSalida.difference(_horaEntrada).inMinutes;
+    if (difference > 0) {
+      // Set the calculated value, but user can still edit the TextField
+      _tiempoFondoController.text = difference.toString();
+    } else {
+      _showErrorSnackBar(
+          'La hora de salida debe ser mayor a la hora de entrada');
+      _tiempoFondoController.text = '';
+    }
+  }
+
   void _showErrorSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context)
@@ -312,7 +324,8 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
                 if (!isPremium) {
                   final result = await Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const PaywallScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const PaywallScreen()),
                   );
                   // If they didn't purchase or restore successfully, don't proceed
                   if (result != true) return;
@@ -605,7 +618,10 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           icon: Icons.login,
           value: _horaEntrada,
           onTap: () => _selectDateTime(context, _horaEntrada, (date) {
-            setState(() => _horaEntrada = date);
+            setState(() {
+              _horaEntrada = date;
+              _calculateBottomTime();
+            });
           }),
           dateFormat: dateFormat,
         ),
@@ -615,7 +631,10 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           icon: Icons.logout,
           value: _horaSalida,
           onTap: () => _selectDateTime(context, _horaSalida, (date) {
-            setState(() => _horaSalida = date);
+            setState(() {
+              _horaSalida = date;
+              _calculateBottomTime();
+            });
           }),
           dateFormat: dateFormat,
         ),
