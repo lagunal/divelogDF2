@@ -4,8 +4,7 @@ import 'package:logging/logging.dart';
 
 class FirebaseStorageService {
   static final Logger _log = Logger('FirebaseStorageService');
-  final FirebaseStorage _storage = FirebaseStorage.instanceFor(
-      bucket: 'gs://lmhezq2u3og1a9fif4vfxxhpmdp6e1.firebasestorage.app');
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   Future<String?> uploadProfilePhoto(File imageFile, String userId) async {
     try {
