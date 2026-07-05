@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/theme.dart';
+import 'package:divedatapro/models/dive_session.dart';
+import 'package:divedatapro/theme.dart';
 import 'package:intl/intl.dart';
 
 class DiveCard extends StatelessWidget {

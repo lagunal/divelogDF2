@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:divelogtest/theme.dart';
+import 'package:divedatapro/theme.dart';
 
 class EmptyStateCard extends StatelessWidget {
   final IconData icon;

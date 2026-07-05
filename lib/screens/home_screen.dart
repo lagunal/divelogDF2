@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
-import 'package:divelogtest/theme.dart';
-import 'package:divelogtest/widgets/quick_action_card.dart';
-import 'package:divelogtest/widgets/stat_card.dart';
-import 'package:divelogtest/widgets/dive_card.dart';
-import 'package:divelogtest/widgets/empty_state_card.dart';
-import 'package:divelogtest/screens/dive_list_screen.dart';
-import 'package:divelogtest/screens/add_edit_dive_screen.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
+import 'package:divedatapro/theme.dart';
+import 'package:divedatapro/widgets/quick_action_card.dart';
+import 'package:divedatapro/widgets/stat_card.dart';
+import 'package:divedatapro/widgets/dive_card.dart';
+import 'package:divedatapro/widgets/empty_state_card.dart';
+import 'package:divedatapro/screens/dive_list_screen.dart';
+import 'package:divedatapro/screens/add_edit_dive_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

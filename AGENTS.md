@@ -51,7 +51,7 @@
 
 ### Data Layer Rules (CRITICAL)
 - **Hybrid Storage:**
-    - **Mobile:** Uses `sqflite` (`divelogtest.db`).
+    - **Mobile:** Uses `sqflite` (`divedatapro.db`).
     - **Web:** Uses `shared_preferences` (Limited capability).
 - **SQLite Data Types:**
     - SQLite does NOT support `List` or `Map` directly.

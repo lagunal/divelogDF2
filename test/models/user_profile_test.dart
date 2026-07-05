@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:divelogtest/models/user_profile.dart';
+import 'package:divedatapro/models/user_profile.dart';
 
 void main() {
   group('UserProfile serialization', () {
@@ -29,11 +29,14 @@ void main() {
       expect(decoded.totalDives, base.totalDives);
       expect(decoded.totalBottomTime, base.totalBottomTime);
       expect(decoded.deepestDive, base.deepestDive);
-      
+
       // Dates
-      expect(decoded.certificationDate?.toIso8601String(), base.certificationDate?.toIso8601String());
-      expect(decoded.createdAt.toIso8601String(), base.createdAt.toIso8601String());
-      expect(decoded.updatedAt.toIso8601String(), base.updatedAt.toIso8601String());
+      expect(decoded.certificationDate?.toIso8601String(),
+          base.certificationDate?.toIso8601String());
+      expect(decoded.createdAt.toIso8601String(),
+          base.createdAt.toIso8601String());
+      expect(decoded.updatedAt.toIso8601String(),
+          base.updatedAt.toIso8601String());
     });
 
     test('fromJson handles null optional fields', () {
@@ -51,7 +54,7 @@ void main() {
     test('fromJson handles numeric type conversions (int to double)', () {
       final map = base.toJson();
       // Force int where double is expected
-      map['totalBottomTime'] = 500; 
+      map['totalBottomTime'] = 500;
       map['deepestDive'] = 30;
 
       final decoded = UserProfile.fromJson(map);

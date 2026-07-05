@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:logging/logging.dart';
-import 'package:divelogtest/services/user_service.dart';
+import 'package:divedatapro/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SubscriptionService {

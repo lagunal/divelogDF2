@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:divelogtest/services/dive_service.dart';
-import 'package:divelogtest/models/dive_session.dart';
+import 'package:divedatapro/services/dive_service.dart';
+import 'package:divedatapro/models/dive_session.dart';
 
 void main() {
   group('DiveService Statistics', () {

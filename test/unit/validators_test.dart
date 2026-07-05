@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:divelogtest/utils/validators.dart';
+import 'package:divedatapro/utils/validators.dart';
 
 void main() {
   group('Validators', () {
@@ -13,21 +13,25 @@ void main() {
     test('email validates correctly', () {
       expect(Validators.email(null), 'Correo electrónico requerido');
       expect(Validators.email(''), 'Correo electrónico requerido');
-      expect(Validators.email('invalid'), 'Ingresa un correo electrónico válido');
+      expect(
+          Validators.email('invalid'), 'Ingresa un correo electrónico válido');
       expect(Validators.email('test@'), 'Ingresa un correo electrónico válido');
-      expect(Validators.email('test@domain'), 'Ingresa un correo electrónico válido');
+      expect(Validators.email('test@domain'),
+          'Ingresa un correo electrónico válido');
       expect(Validators.email('test@domain.com'), null);
     });
 
     test('password validates length', () {
       expect(Validators.password(null), 'Contraseña requerida');
       expect(Validators.password(''), 'Contraseña requerida');
-      expect(Validators.password('123'), 'La contraseña debe tener al menos 6 caracteres');
+      expect(Validators.password('123'),
+          'La contraseña debe tener al menos 6 caracteres');
       expect(Validators.password('123456'), null);
     });
 
     test('number validates numeric input', () {
-      expect(Validators.number(null), null); // Optional unless combined with required
+      expect(Validators.number(null),
+          null); // Optional unless combined with required
       expect(Validators.number(''), null);
       expect(Validators.number('abc'), 'Ingresa un número válido');
       expect(Validators.number('123'), null);

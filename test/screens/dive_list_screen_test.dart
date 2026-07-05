@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:divelogtest/screens/dive_list_screen.dart';
-import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/services/dive_service.dart';
-import 'package:divelogtest/widgets/dive_card.dart';
+import 'package:divedatapro/screens/dive_list_screen.dart';
+import 'package:divedatapro/models/dive_session.dart';
+import 'package:divedatapro/services/dive_service.dart';
+import 'package:divedatapro/widgets/dive_card.dart';
 
 // Mock DiveService
 class MockDiveService implements DiveService {

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:divelogtest/services/database_helper.dart'
-    if (dart.library.html) 'package:divelogtest/services/database_helper_stub.dart';
+import 'package:divedatapro/services/database_helper.dart'
+    if (dart.library.html) 'package:divedatapro/services/database_helper_stub.dart';
 import 'package:logging/logging.dart';
 
 // Import web storage conditionally

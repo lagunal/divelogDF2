@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:divelogtest/auth/firebase_auth_manager.dart';
-import 'package:divelogtest/services/firestore_user_service.dart';
+import 'package:divedatapro/auth/firebase_auth_manager.dart';
+import 'package:divedatapro/services/firestore_user_service.dart';
 import 'package:logging/logging.dart';
 
 class LoginScreen extends StatefulWidget {

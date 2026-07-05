@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
 import 'package:intl/intl.dart';
-import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/services/user_service.dart';
-import 'package:divelogtest/services/export_service.dart';
-import 'package:divelogtest/theme.dart';
-import 'package:divelogtest/widgets/custom_text_field.dart';
-import 'package:divelogtest/utils/validators.dart';
-import 'package:divelogtest/screens/paywall_screen.dart';
+import 'package:divedatapro/models/dive_session.dart';
+import 'package:divedatapro/services/user_service.dart';
+import 'package:divedatapro/services/export_service.dart';
+import 'package:divedatapro/theme.dart';
+import 'package:divedatapro/widgets/custom_text_field.dart';
+import 'package:divedatapro/utils/validators.dart';
+import 'package:divedatapro/screens/paywall_screen.dart';
 import 'package:logging/logging.dart';
 
 class AddEditDiveScreen extends StatefulWidget {

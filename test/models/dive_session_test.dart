@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:divelogtest/models/dive_session.dart';
+import 'package:divedatapro/models/dive_session.dart';
 
 void main() {
   group('DiveSession serialization', () {
