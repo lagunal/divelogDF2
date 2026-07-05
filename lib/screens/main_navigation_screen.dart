@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:divelogtest/screens/home_screen.dart';
-import 'package:divelogtest/screens/dive_list_screen.dart';
-import 'package:divelogtest/screens/statistics_screen.dart';
-import 'package:divelogtest/screens/profile_screen.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
-import 'package:divelogtest/services/user_service.dart';
-import 'package:divelogtest/models/user_profile.dart';
-import 'package:divelogtest/widgets/sync_status_indicator.dart';
-import 'package:divelogtest/widgets/custom_about_dialog.dart';
+import 'package:divedatapro/screens/home_screen.dart';
+import 'package:divedatapro/screens/dive_list_screen.dart';
+import 'package:divedatapro/screens/statistics_screen.dart';
+import 'package:divedatapro/screens/profile_screen.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
+import 'package:divedatapro/services/user_service.dart';
+import 'package:divedatapro/models/user_profile.dart';
+import 'package:divedatapro/widgets/sync_status_indicator.dart';
+import 'package:divedatapro/widgets/custom_about_dialog.dart';
 import 'package:logging/logging.dart';
 
 class MainNavigationScreen extends StatefulWidget {

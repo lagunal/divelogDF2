@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:divelogtest/widgets/dive_card.dart';
-import 'package:divelogtest/models/dive_session.dart';
+import 'package:divedatapro/widgets/dive_card.dart';
+import 'package:divedatapro/models/dive_session.dart';
 import '../utils/test_theme.dart';
 
 void main() {

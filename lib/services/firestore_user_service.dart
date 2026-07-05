@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:divelogtest/models/user_profile.dart';
-import 'package:divelogtest/services/firestore_dive_service.dart';
+import 'package:divedatapro/models/user_profile.dart';
+import 'package:divedatapro/services/firestore_dive_service.dart';
 import 'package:logging/logging.dart';
 
 class FirestoreUserService {

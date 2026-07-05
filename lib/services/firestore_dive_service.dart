@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:divelogtest/models/dive_session.dart';
+import 'package:divedatapro/models/dive_session.dart';
 import 'package:uuid/uuid.dart';
 import 'package:logging/logging.dart';
 

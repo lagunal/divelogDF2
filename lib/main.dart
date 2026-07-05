@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:divelogtest/firebase_options.dart';
+import 'package:divedatapro/firebase_options.dart';
 import 'package:flutter/foundation.dart';
-import 'package:divelogtest/services/subscription_service.dart';
-import 'package:divelogtest/screens/auth_wrapper.dart';
-import 'package:divelogtest/theme.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
+import 'package:divedatapro/services/subscription_service.dart';
+import 'package:divedatapro/screens/auth_wrapper.dart';
+import 'package:divedatapro/theme.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
 import 'package:logging/logging.dart';
-import 'package:divelogtest/widgets/error_boundary.dart';
+import 'package:divedatapro/widgets/error_boundary.dart';
 import 'dart:developer' as developer;
 
 void main() async {

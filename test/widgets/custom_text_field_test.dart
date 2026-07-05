@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:divelogtest/widgets/custom_text_field.dart';
+import 'package:divedatapro/widgets/custom_text_field.dart';
 
 void main() {
-  testWidgets('CustomTextField renders with label and handles input', (WidgetTester tester) async {
+  testWidgets('CustomTextField renders with label and handles input',
+      (WidgetTester tester) async {
     final controller = TextEditingController();
-    
+
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -18,12 +19,13 @@ void main() {
     );
 
     expect(find.text('Test Field'), findsOneWidget);
-    
+
     await tester.enterText(find.byType(CustomTextField), 'Hello');
     expect(controller.text, 'Hello');
   });
 
-  testWidgets('CustomTextField shows error validation', (WidgetTester tester) async {
+  testWidgets('CustomTextField shows error validation',
+      (WidgetTester tester) async {
     final controller = TextEditingController();
     final formKey = GlobalKey<FormState>();
 

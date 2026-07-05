@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:divelogtest/theme.dart';
+import 'package:divedatapro/theme.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -73,17 +73,19 @@ class CustomTextField extends StatelessWidget {
       maxLines: maxLines,
       obscureText: obscureText,
       onChanged: onChanged,
-      validator: validator ?? (required
-          ? (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Campo requerido';
-              }
-              return null;
-            }
-          : null),
-      inputFormatters: inputFormatters ?? (keyboardType == TextInputType.number
-          ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))]
-          : null),
+      validator: validator ??
+          (required
+              ? (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Campo requerido';
+                  }
+                  return null;
+                }
+              : null),
+      inputFormatters: inputFormatters ??
+          (keyboardType == TextInputType.number
+              ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))]
+              : null),
       style: theme.textTheme.bodyLarge,
     );
   }

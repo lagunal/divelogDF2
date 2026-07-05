@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:divelogtest/auth/auth_manager.dart';
+import 'package:divedatapro/auth/auth_manager.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseAuthManager extends AuthManager with EmailSignInManager {

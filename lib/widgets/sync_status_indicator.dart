@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
 
 /// Displays sync status indicator with online/offline state and pending sync count
 class SyncStatusIndicator extends StatelessWidget {
@@ -172,7 +172,8 @@ class SyncStatusBanner extends StatelessWidget {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(backgroundColor),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(backgroundColor),
                       ),
                     ),
                 ],

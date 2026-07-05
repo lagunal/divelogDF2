@@ -1,7 +1,7 @@
-import 'package:divelogtest/models/user_profile.dart';
-import 'package:divelogtest/services/storage_service.dart';
-import 'package:divelogtest/services/dive_service.dart';
-import 'package:divelogtest/services/firestore_user_service.dart';
+import 'package:divedatapro/models/user_profile.dart';
+import 'package:divedatapro/services/storage_service.dart';
+import 'package:divedatapro/services/dive_service.dart';
+import 'package:divedatapro/services/firestore_user_service.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logging/logging.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
-import 'package:divelogtest/services/user_service.dart';
-import 'package:divelogtest/theme.dart';
+import 'package:divedatapro/models/dive_session.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
+import 'package:divedatapro/services/user_service.dart';
+import 'package:divedatapro/theme.dart';
 import 'package:intl/intl.dart';
 
 class StatisticsScreen extends StatefulWidget {
@@ -40,10 +40,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Map<String, int> _getLocationStats(List<DiveSession> allDives) {
     final Map<String, int> locationCount = {};
     for (var dive in allDives) {
-      locationCount[dive.lugarBuceo] = (locationCount[dive.lugarBuceo] ?? 0) + 1;
+      locationCount[dive.lugarBuceo] =
+          (locationCount[dive.lugarBuceo] ?? 0) + 1;
     }
     return Map.fromEntries(
-      locationCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value)),
+      locationCount.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value)),
     );
   }
 
@@ -55,7 +57,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return typeCount;
   }
 
-  List<DiveSession> _getRecentDives(List<DiveSession> allDives) => allDives.take(5).toList();
+  List<DiveSession> _getRecentDives(List<DiveSession> allDives) =>
+      allDives.take(5).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -75,135 +78,141 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 : RefreshIndicator(
                     onRefresh: _refreshStatistics,
                     child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: AppSpacing.paddingLg,
-                        child: Text(
-                          'Estadísticas',
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: AppSpacing.paddingLg,
+                            child: Text(
+                              'Estadísticas',
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
 
-                      // Overview Stats
-                      Padding(
-                        padding: AppSpacing.horizontalLg,
-                        child: Column(
-                          children: [
-                            Row(
+                          // Overview Stats
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: _StatCard(
-                                    icon: Icons.water,
-                                    value: '${stats['totalDives'] ?? 0}',
-                                    label: 'Total Inmersiones',
-                                    color: colorScheme.primary,
-                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _StatCard(
+                                        icon: Icons.water,
+                                        value: '${stats['totalDives'] ?? 0}',
+                                        label: 'Total Inmersiones',
+                                        color: colorScheme.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: _StatCard(
+                                        icon: Icons.schedule,
+                                        value:
+                                            '${(stats['totalDiveTime'] ?? 0).toStringAsFixed(0)}m',
+                                        label: 'Tiempo Total',
+                                        color: colorScheme.secondary,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _StatCard(
-                                    icon: Icons.schedule,
-                                    value: '${(stats['totalDiveTime'] ?? 0).toStringAsFixed(0)}m',
-                                    label: 'Tiempo Total',
-                                    color: colorScheme.secondary,
-                                  ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _StatCard(
+                                        icon: Icons.arrow_downward,
+                                        value:
+                                            '${(stats['deepestDive'] ?? 0).toStringAsFixed(1)}m',
+                                        label: 'Profundidad Máxima',
+                                        color: colorScheme.tertiary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: _StatCard(
+                                        icon: Icons.water_drop,
+                                        value:
+                                            '${(stats['averageDepth'] ?? 0).toStringAsFixed(1)}m',
+                                        label: 'Prof. Promedio',
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _StatCard(
-                                    icon: Icons.arrow_downward,
-                                    value: '${(stats['deepestDive'] ?? 0).toStringAsFixed(1)}m',
-                                    label: 'Profundidad Máxima',
-                                    color: colorScheme.tertiary,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _StatCard(
-                                    icon: Icons.water_drop,
-                                    value: '${(stats['averageDepth'] ?? 0).toStringAsFixed(1)}m',
-                                    label: 'Prof. Promedio',
-                                    color: Colors.orange,
-                                  ),
-                                ),
-                              ],
+                          ),
+
+                          const SizedBox(height: 32),
+
+                          // Location Stats
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: Text(
+                              'Lugares Más Visitados',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Location Stats
-                      Padding(
-                        padding: AppSpacing.horizontalLg,
-                        child: Text(
-                          'Lugares Más Visitados',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: AppSpacing.horizontalLg,
-                        child: _LocationStatsCard(locations: _getLocationStats(allDives)),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Dive Type Stats
-                      Padding(
-                        padding: AppSpacing.horizontalLg,
-                        child: Text(
-                          'Tipos de Buceo',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: _LocationStatsCard(
+                                locations: _getLocationStats(allDives)),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: AppSpacing.horizontalLg,
-                        child: _DiveTypeStatsCard(diveTypes: _getDiveTypeStats(allDives)),
-                      ),
 
-                      const SizedBox(height: 32),
+                          const SizedBox(height: 32),
 
-                      // Recent Activity
-                      Padding(
-                        padding: AppSpacing.horizontalLg,
-                        child: Text(
-                          'Actividad Reciente',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
+                          // Dive Type Stats
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: Text(
+                              'Tipos de Buceo',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: AppSpacing.horizontalLg,
-                        child: _RecentActivityCard(recentDives: _getRecentDives(allDives)),
-                      ),
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: _DiveTypeStatsCard(
+                                diveTypes: _getDiveTypeStats(allDives)),
+                          ),
 
-                      const SizedBox(height: 24),
-                    ],
+                          const SizedBox(height: 32),
+
+                          // Recent Activity
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: Text(
+                              'Actividad Reciente',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: _RecentActivityCard(
+                                recentDives: _getRecentDives(allDives)),
+                          ),
+
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
           ),
         );
       },
@@ -333,7 +342,8 @@ class _LocationStatsCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: colorScheme.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -422,7 +432,8 @@ class _DiveTypeStatsCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: colorScheme.secondary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),

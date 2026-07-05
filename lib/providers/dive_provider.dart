@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/models/user_profile.dart'; // Added import
-import 'package:divelogtest/services/dive_service.dart';
-import 'package:divelogtest/services/firestore_user_service.dart'; // Added import
+import 'package:divedatapro/models/dive_session.dart';
+import 'package:divedatapro/models/user_profile.dart'; // Added import
+import 'package:divedatapro/services/dive_service.dart';
+import 'package:divedatapro/services/firestore_user_service.dart'; // Added import
 import 'package:logging/logging.dart';
 
 class DiveProvider extends ChangeNotifier {

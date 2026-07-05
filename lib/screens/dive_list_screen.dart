@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/services/dive_service.dart';
-import 'package:divelogtest/services/export_service.dart';
-import 'package:divelogtest/theme.dart';
-import 'package:divelogtest/widgets/dive_card.dart';
-import 'package:divelogtest/widgets/empty_state_card.dart';
-import 'package:divelogtest/screens/add_edit_dive_screen.dart';
+import 'package:divedatapro/models/dive_session.dart';
+import 'package:divedatapro/services/dive_service.dart';
+import 'package:divedatapro/services/export_service.dart';
+import 'package:divedatapro/theme.dart';
+import 'package:divedatapro/widgets/dive_card.dart';
+import 'package:divedatapro/widgets/empty_state_card.dart';
+import 'package:divedatapro/screens/add_edit_dive_screen.dart';
 import 'package:intl/intl.dart';
 
 class DiveListScreen extends StatefulWidget {

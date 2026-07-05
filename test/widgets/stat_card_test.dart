@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:divelogtest/widgets/stat_card.dart';
+import 'package:divedatapro/widgets/stat_card.dart';
 import '../utils/test_theme.dart';
 
 void main() {

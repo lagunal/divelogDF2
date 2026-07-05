@@ -6,7 +6,7 @@ import 'package:printing/printing.dart';
 import 'package:csv/csv.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:divelogtest/models/dive_session.dart';
+import 'package:divedatapro/models/dive_session.dart';
 
 class ExportService {
   final DateFormat _dateFormat = DateFormat('dd/MM/yyyy HH:mm');

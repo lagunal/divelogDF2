@@ -22,7 +22,7 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     try {
       final dbDir = await getDatabasesPath();
-      final path = join(dbDir, 'divelogtest.db');
+      final path = join(dbDir, 'divedatapro.db');
 
       return openDatabase(
         path,
@@ -144,10 +144,12 @@ class DatabaseHelper {
 
     if (oldVersion < 5) {
       try {
-        await db.execute('ALTER TABLE user_profiles ADD COLUMN isPremium INTEGER DEFAULT 0');
+        await db.execute(
+            'ALTER TABLE user_profiles ADD COLUMN isPremium INTEGER DEFAULT 0');
         _log.info('Database upgraded to v5: added isPremium column');
       } catch (e) {
-        _log.warning('Error upgrading database to v5 (column may already exist)', e);
+        _log.warning(
+            'Error upgrading database to v5 (column may already exist)', e);
       }
     }
   }

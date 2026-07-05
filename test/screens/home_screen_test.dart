@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
-import 'package:divelogtest/screens/home_screen.dart';
-import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/models/user_profile.dart';
-import 'package:divelogtest/services/dive_service.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
+import 'package:divedatapro/screens/home_screen.dart';
+import 'package:divedatapro/models/dive_session.dart';
+import 'package:divedatapro/models/user_profile.dart';
+import 'package:divedatapro/services/dive_service.dart';
 
 // Mock DiveProvider with sample data
 class MockDiveProviderWithDives extends ChangeNotifier implements DiveProvider {

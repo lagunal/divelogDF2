@@ -1,5 +1,5 @@
-import 'package:divelogtest/screens/add_edit_dive_screen.dart';
-import 'package:divelogtest/theme.dart';
+import 'package:divedatapro/screens/add_edit_dive_screen.dart';
+import 'package:divedatapro/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

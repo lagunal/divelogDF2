@@ -2,17 +2,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:divelogtest/models/user_profile.dart';
-import 'package:divelogtest/services/user_service.dart';
-import 'package:divelogtest/services/firebase_storage_service.dart';
-import 'package:divelogtest/auth/firebase_auth_manager.dart';
-import 'package:divelogtest/screens/privacy_policy_screen.dart';
-import 'package:divelogtest/widgets/custom_about_dialog.dart';
-import 'package:divelogtest/theme.dart';
+import 'package:divedatapro/models/user_profile.dart';
+import 'package:divedatapro/services/user_service.dart';
+import 'package:divedatapro/services/firebase_storage_service.dart';
+import 'package:divedatapro/auth/firebase_auth_manager.dart';
+import 'package:divedatapro/screens/privacy_policy_screen.dart';
+import 'package:divedatapro/widgets/custom_about_dialog.dart';
+import 'package:divedatapro/theme.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:divelogtest/providers/dive_provider.dart';
-import 'package:divelogtest/screens/paywall_screen.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
+import 'package:divedatapro/screens/paywall_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserService? userService;
@@ -225,8 +225,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-
-
   @override
   void initState() {
     super.initState();
@@ -272,7 +270,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isPremium = diveProvider.isPremium;
     final stats = diveProvider.statistics;
     final totalDives = stats['totalDives'] ?? _userProfile?.totalDives ?? 0;
-    final totalBottomTime = stats['totalBottomTime'] ?? _userProfile?.totalBottomTime ?? 0;
+    final totalBottomTime =
+        stats['totalBottomTime'] ?? _userProfile?.totalBottomTime ?? 0;
 
     return Scaffold(
       body: SafeArea(
@@ -528,7 +527,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const PrivacyPolicyScreen(),
+                                    builder: (context) =>
+                                        const PrivacyPolicyScreen(),
                                   ),
                                 );
                               },
@@ -581,7 +581,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           decoration: BoxDecoration(
             color: colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+            border:
+                Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -612,7 +613,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
           if (result == true) {
             _loadUserProfile(); // Reload to get updated premium status
-            context.read<DiveProvider>().refreshData(_userService.getCurrentUserId() ?? '');
+            context
+                .read<DiveProvider>()
+                .refreshData(_userService.getCurrentUserId() ?? '');
           }
         },
         borderRadius: BorderRadius.circular(AppRadius.md),

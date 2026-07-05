@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:divelogtest/models/dive_session.dart';
-import 'package:divelogtest/services/storage_service.dart';
-import 'package:divelogtest/services/firestore_dive_service.dart';
+import 'package:divedatapro/models/dive_session.dart';
+import 'package:divedatapro/services/storage_service.dart';
+import 'package:divedatapro/services/firestore_dive_service.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
