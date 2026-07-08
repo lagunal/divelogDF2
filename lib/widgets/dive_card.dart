@@ -78,13 +78,13 @@ class DiveCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                dive.lugarBuceo,
+                dive.buque,
                 style: theme.textTheme.titleMedium?.semiBold,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                dateStr,
+                dive.lugarBuceo,
                 style: theme.textTheme.bodySmall?.withColor(
                   colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                 ),
