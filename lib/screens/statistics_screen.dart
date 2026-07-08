@@ -150,6 +150,26 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
                           const SizedBox(height: 32),
 
+                          // Recent Activity
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: Text(
+                              'Actividad Reciente',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: AppSpacing.horizontalLg,
+                            child: _RecentActivityCard(
+                                recentDives: _getRecentDives(allDives)),
+                          ),
+
+                          const SizedBox(height: 32),
+
                           // Location Stats
                           Padding(
                             padding: AppSpacing.horizontalLg,
@@ -188,25 +208,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                 diveTypes: _getDiveTypeStats(allDives)),
                           ),
 
-                          const SizedBox(height: 32),
-
-                          // Recent Activity
-                          Padding(
-                            padding: AppSpacing.horizontalLg,
-                            child: Text(
-                              'Actividad Reciente',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Padding(
-                            padding: AppSpacing.horizontalLg,
-                            child: _RecentActivityCard(
-                                recentDives: _getRecentDives(allDives)),
-                          ),
+                          //const SizedBox(height: 32),
 
                           const SizedBox(height: 24),
                         ],
@@ -516,7 +518,7 @@ class _RecentActivityCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        dive.lugarBuceo,
+                        dive.buque,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface,
