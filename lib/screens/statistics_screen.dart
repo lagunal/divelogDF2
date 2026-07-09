@@ -208,8 +208,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                 diveTypes: _getDiveTypeStats(allDives)),
                           ),
 
-                          //const SizedBox(height: 32),
-
                           const SizedBox(height: 24),
                         ],
                       ),

@@ -320,9 +320,11 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
               onSelected: (value) async {
                 if (widget.existingDive == null) return;
                 // Check if user has premium
-                if (!await SubscriptionService.checkPremiumAndProceed(context)) {
+                if (!await SubscriptionService.checkPremiumAndProceed(
+                    context)) {
                   return;
                 }
+                if (!mounted) return;
 
                 setState(() => _isLoading = true);
                 try {
