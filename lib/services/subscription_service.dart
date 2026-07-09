@@ -3,6 +3,10 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:logging/logging.dart';
 import 'package:divedatapro/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:divedatapro/providers/dive_provider.dart';
+import 'package:divedatapro/screens/paywall_screen.dart';
 
 class SubscriptionService {
   static final Logger _log = Logger('SubscriptionService');
@@ -120,8 +124,29 @@ class SubscriptionService {
       }
       return [];
     } catch (e) {
-      _log.severe('Error fetching offerings', e);
+      _log.severe('Error getting offerings', e);
       return [];
+    }
+  }
+
+  /// Checks if the user is premium. If not, shows the Paywall.
+  /// Returns `true` if the user is premium or successfully purchased premium.
+  static Future<bool> checkPremiumAndProceed(BuildContext context) async {
+    try {
+      final isPremium = context.read<DiveProvider>().isPremium;
+      if (isPremium) return true;
+
+      // When migrating to RevenueCatUI, simply replace these lines with:
+      // await RevenueCatUI.presentPaywall();
+      // TODO: migrate to GoRouter (context.push) instead of Navigator.push.
+      final result = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(builder: (context) => const PaywallScreen()),
+      );
+      return result == true;
+    } catch (e) {
+      _log.severe('Error checking premium/proceeding to paywall', e);
+      return false;
     }
   }
 

@@ -1,7 +1,7 @@
-# Dive Log App (divelogDF2) - Developer Context
+# DiveDataPro - Bitacora de Buceo - Developer Context
 
 ## Project Overview
-**Dive Log App** is a cross-platform mobile application (Android/iOS/Web) designed for divers to log and track their diving sessions. It features a professional logbook for certification and safety, with offline-first capabilities and cloud synchronization.
+**DiveDataPro** is a cross-platform mobile application (Android/iOS/Web) designed for divers to log and track their diving sessions. It features a professional logbook for certification and safety, with offline-first capabilities and cloud synchronization.
 
 ## Current Status
 **Active Phase:** Phase 5 (Enhanced Features) - Started.

@@ -19,7 +19,7 @@ void showCustomAboutDialog(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'DiveDataPro',
+            'DiveDataPro - Bitácora de Buceo',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),

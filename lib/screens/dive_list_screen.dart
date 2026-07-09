@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:divedatapro/providers/dive_provider.dart';
+import 'package:divedatapro/services/subscription_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:divedatapro/models/dive_session.dart';
 import 'package:divedatapro/services/dive_service.dart';
@@ -202,6 +203,13 @@ class _DiveListScreenState extends State<DiveListScreen> {
                   icon: Icon(Icons.share, color: colorScheme.primary),
                   tooltip: 'Exportar Lista',
                   onSelected: (value) async {
+                    // Check if user has premium
+                    if (!await SubscriptionService.checkPremiumAndProceed(
+                        context)) {
+                      return;
+                    }
+                    if (!mounted) return;
+
                     setState(() => _isLoading = true);
                     try {
                       if (value == 'pdf') {

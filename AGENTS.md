@@ -1,7 +1,7 @@
-# Dive Log App (Registro de Buceo) - Developer Guide
+# DiveDataPro - Bitacora de Buceo - Developer Guide
 
 ## 1. Project Overview
-**Dive Log App** is a cross-platform mobile application (Android/iOS/Web) designed for divers to log and track their diving sessions. It provides a professional logbook for certification and safety purposes.
+**DiveDataPro** is a cross-platform mobile application (Android/iOS/Web) designed for divers to log and track their diving sessions. It provides a professional logbook for certification and safety purposes.
 
 **Tech Stack:**
 - **Framework:** Flutter (Latest)
@@ -85,7 +85,6 @@
 3.  Update `lib/screens/add_edit_dive_screen.dart` to include the new form field.
 
 ## 6. Project Constraints
-- **Dreamflow Compatibility:** The app runs in a web-based preview (Dreamflow). Ensure `StorageService` handles the Web platform gracefully (using SharedPreferences fallback) so the preview doesn't crash, even if SQLite is the primary mobile storage.
 - **Firebase:** Ensure all Firebase interactions are guarded or correctly initialized (`initialize(userId)`), as the app supports offline-first/local-first behavior.
 - ** Always follow implementation plan described on plan.md file on root folder. 
 - ** Always update plan.md file to track phases , tasks and subtasks. 
