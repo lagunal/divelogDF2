@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:logging/logging.dart';
 import 'package:divedatapro/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -136,14 +137,16 @@ class SubscriptionService {
       final isPremium = context.read<DiveProvider>().isPremium;
       if (isPremium) return true;
 
-      // When migrating to RevenueCatUI, simply replace these lines with:
-      // await RevenueCatUI.presentPaywall();
       // TODO: migrate to GoRouter (context.push) instead of Navigator.push.
-      final result = await Navigator.push<bool>(
-        context,
-        MaterialPageRoute(builder: (context) => const PaywallScreen()),
-      );
-      return result == true;
+      //final result = await Navigator.push<bool>(
+      //  context,
+      //  MaterialPageRoute(builder: (context) => const PaywallScreen()),
+      //);
+      final result = await RevenueCatUI.presentPaywall();
+      _log.info('Paywall result: $result');
+
+      //user is not premium but RevenueCatUI.presentPaywall() is called. so we need to return false.
+      return false;
     } catch (e) {
       _log.severe('Error checking premium/proceeding to paywall', e);
       return false;
