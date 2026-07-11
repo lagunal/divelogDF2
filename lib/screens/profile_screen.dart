@@ -609,13 +609,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: AppSpacing.horizontalLg,
       child: InkWell(
         onTap: () async {
-          // final result = await Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => const PaywallScreen()),
-          // );
-
           final result =
               await SubscriptionService.checkPremiumAndProceed(context);
+
+          if (!context.mounted) return;
 
           if (result == true) {
             _loadUserProfile(); // Reload to get updated premium status

@@ -145,7 +145,10 @@ class SubscriptionService {
       final result = await RevenueCatUI.presentPaywall();
       _log.info('Paywall result: $result');
 
-      //user is not premium but RevenueCatUI.presentPaywall() is called. so we need to return false.
+      if (result == PaywallResult.purchased ||
+          result == PaywallResult.restored) {
+        return true;
+      }
       return false;
     } catch (e) {
       _log.severe('Error checking premium/proceeding to paywall', e);
