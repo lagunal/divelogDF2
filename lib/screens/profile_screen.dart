@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +14,7 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:divedatapro/providers/dive_provider.dart';
 import 'package:divedatapro/screens/paywall_screen.dart';
+import 'package:divedatapro/services/subscription_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserService? userService;
@@ -607,10 +609,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: AppSpacing.horizontalLg,
       child: InkWell(
         onTap: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const PaywallScreen()),
-          );
+          final result =
+              await SubscriptionService.checkPremiumAndProceed(context);
+
+          if (!context.mounted) return;
+
           if (result == true) {
             _loadUserProfile(); // Reload to get updated premium status
             context
