@@ -121,6 +121,7 @@ class SubscriptionService {
     try {
       final offerings = await Purchases.getOfferings();
       if (offerings.current != null) {
+        _log.info('Offerings: $offerings');
         return offerings.current!.availablePackages;
       }
       return [];
@@ -138,10 +139,15 @@ class SubscriptionService {
       if (isPremium) return true;
 
       // TODO: migrate to GoRouter (context.push) instead of Navigator.push.
-      //final result = await Navigator.push<bool>(
-      //  context,
-      //  MaterialPageRoute(builder: (context) => const PaywallScreen()),
-      //);
+      // ************************************
+      // * snippet to use local paywall screen
+      // final result = await Navigator.push<bool>(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const PaywallScreen()),
+      // );
+      // return result == true;
+      // **********************************
+
       final result = await RevenueCatUI.presentPaywall();
       _log.info('Paywall result: $result');
 
