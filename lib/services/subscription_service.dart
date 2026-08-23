@@ -153,6 +153,23 @@ class SubscriptionService {
 
       if (result == PaywallResult.purchased ||
           result == PaywallResult.restored) {
+        // 1. Obtener la información del cliente actualizada tras la transacción
+        CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+        
+        // 2. Comprobar si el acceso activo está en Sandbox o Producción
+        bool isProduction = true;
+        customerInfo.entitlements.all.forEach((key, entitlement) {
+          if (entitlement.isActive && entitlement.isSandbox) {
+            isProduction = false; // Se detectó un entitlement de pruebas
+          }
+        });
+
+        if (isProduction) {
+          _log.info('Ambiente verificado: ¡Estás en PRODUCCIÓN con dinero real!');
+        } else {
+          _log.info('Ambiente verificado: Estás en Sandbox (Entorno de pruebas)');
+        }
+
         return true;
       }
       return false;

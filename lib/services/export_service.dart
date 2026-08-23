@@ -83,7 +83,7 @@ class ExportService {
           _buildRow('Dirección', dive.direccionOperadora),
           _buildRow('Lugar', dive.lugarBuceo),
           _buildRow('Tipo', dive.tipoBuceo),
-          _buildRow('Supervisor', dive.supervisorBuceo),
+          _buildRow('Sup. - Credencial', dive.supervisorBuceo),
           _buildRow('Buzos', dive.nombreBuzos.join(', ')),
         ],
       ),
@@ -292,7 +292,7 @@ class ExportService {
       'Tiempo Fondo (min)',
       'Tiempo Total (min)',
       'Descripción',
-      'Supervisor'
+      'Supervisor - Credencial'
     ]);
 
     // Data
@@ -361,7 +361,7 @@ class ExportService {
                 'Prof. (m)',
                 'T. Fondo (min)',
                 'T. Total (min)',
-                'Supervisor'
+                'Supervisor - Credencial'
               ],
               data: dives
                   .map((dive) => [

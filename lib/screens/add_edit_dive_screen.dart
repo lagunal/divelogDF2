@@ -478,7 +478,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
         const SizedBox(height: AppSpacing.md),
         CustomTextField(
           controller: _supervisorController,
-          label: 'Supervisor de Buceo',
+          label: 'Supervisor de Buceo - Credencial',
           prefixIcon: Icons.supervisor_account,
           required: true,
           validator: Validators.required,
@@ -715,8 +715,8 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           controller: _descompresionController,
           label: 'Descompresión Utilizada',
           prefixIcon: Icons.safety_check,
-          required: true,
-          validator: Validators.required,
+          required: false,
+          //validator: Validators.required,
         ),
         const SizedBox(height: AppSpacing.md),
         CustomTextField(
