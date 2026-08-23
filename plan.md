@@ -380,6 +380,10 @@ Each dive session will capture the following information:
 - [ ] Memory: No leaks across navigation loops (DevTools snapshot)
 - [ ] Golden: Critical screens updated snapshots after visual polish
 
+#### Maintenance Update — Water Conditions Icon
+- [x] Replace the timer icon in the "Condiciones del Agua" section header with a water-wave icon.
+- [ ] Validation: `dart format --output=none lib/screens/add_edit_dive_screen.dart` is blocked by Flutter SDK cache permissions.
+
 ### Phase 7: Payments and Subscriptions
 - [x] Payment Integration Setup
   - [x] Choose payment provider (RevenueCat for Flutter)
