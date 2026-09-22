@@ -272,6 +272,11 @@ Each dive session will capture the following information:
   - [x] Create AuthManager service for Firebase authentication (FirebaseAuthManager)
   - [x] Initialize Firebase in main.dart with error handling
   - [x] Create firebase_options.dart with platform-specific configurations
+  - [x] iOS Firebase dependency compatibility
+    - [x] Set the Runner, Flutter framework, and CocoaPods deployment target to iOS 15.0
+    - [x] Refresh CocoaPods specs and verify `pod install` resolves Firebase SDK 12.8.0
+    - [x] Run static analysis and focused model/unit tests after the iOS configuration change (15 tests passed; analyzer reports 41 pre-existing diagnostics)
+    - [x] Clear stalled simulator build processes and regenerate Flutter iOS build files
 - [x] Authentication Screens ✅ COMPLETE
   - [x] Auth Wrapper (AuthWrapper)
     - [x] Check authentication state on app launch using StreamBuilder
