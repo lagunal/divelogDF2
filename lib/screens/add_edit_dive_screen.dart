@@ -586,7 +586,7 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
           //required: true,
           //validator: Validators.temperature,
         ),
-        const SizedBox(height: AppSpacing.md),
+        //const SizedBox(height: AppSpacing.md),
         // CustomTextField(
         //   controller: _corrienteController,
         //   label: 'Corriente de Agua',
@@ -594,14 +594,14 @@ class _AddEditDiveScreenState extends State<AddEditDiveScreen> {
         //   required: true,
         //   validator: Validators.required,
         // ),
-        // const SizedBox(height: AppSpacing.md),
-        // _buildDropdown(
-        //   value: _tipoAguaSeleccionado,
-        //   label: 'Tipo de Agua',
-        //   icon: Icons.water_drop,
-        //   items: ['Salada', 'Dulce', 'Salobre'],
-        //   onChanged: (value) => setState(() => _tipoAguaSeleccionado = value!),
-        // ),
+        const SizedBox(height: AppSpacing.md),
+        _buildDropdown(
+          value: _tipoAguaSeleccionado,
+          label: 'Tipo de Agua',
+          icon: Icons.water_drop,
+          items: ['Salada', 'Dulce', 'Salobre'],
+          onChanged: (value) => setState(() => _tipoAguaSeleccionado = value!),
+        ),
       ],
     );
   }
