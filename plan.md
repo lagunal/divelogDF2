@@ -389,6 +389,15 @@ Each dive session will capture the following information:
 - [x] Replace the timer icon in the "Condiciones del Agua" section header with a water-wave icon.
 - [ ] Validation: `dart format --output=none lib/screens/add_edit_dive_screen.dart` is blocked by Flutter SDK cache permissions.
 
+#### Maintenance Update — Firebase Firestore Security Patch (eMudhra CA revocation)
+- [x] Update `cloud_firestore` 6.1.1 → ^7.1.0 (resolved 7.2.0) per Firebase notice 2026-11-03.
+- [x] Update `firebase_core` ^4.3.0 → ^5.1.0 (resolved 5.2.0), `firebase_auth` → 7.1.0, `firebase_storage` ^13.0.6 → ^14.1.0 (resolved 14.1.0) to satisfy FlutterFire BoM 5.1.0+.
+- [x] Toolchain: verify with Flutter 3.50.0 / Dart 3.14.0 (requires Flutter 3.47.8+ / Dart 3.13.7+).
+- [x] `flutter analyze`: 0 errors (13 warnings, 65 info, pre-existing).
+- [ ] `flutter test`: 33 passed, 14 failed — failures also reproduce on unpatched main with Flutter 3.50 (google_fonts 6.2.1 const-evaluation error); not caused by the Firebase upgrade. To be fixed separately.
+- [ ] `flutter build apk --debug`: BLOCKED in this workspace — Gradle daemon/client communicate over loopback TCP, which the sandbox denies ("Other TCP connections is turned off for this assistant"; needs Muse settings → Permissions → Direct network protocols → other_tcp = Ask). Android SDK (cmdline tools, platform 36, build-tools 36.0.0) and JDK 17 are installed; retry the build after enabling that permission.
+- [ ] Release build + Google Play upload: done by owner on his MacBook after PR approval (signed keystore stays local).
+
 ### Phase 7: Payments and Subscriptions
 - [x] Payment Integration Setup
   - [x] Choose payment provider (RevenueCat for Flutter)
