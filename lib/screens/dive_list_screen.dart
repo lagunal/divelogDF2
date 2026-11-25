@@ -60,7 +60,8 @@ class _DiveListScreenState extends State<DiveListScreen> {
         final query = _searchQuery.toLowerCase();
         if (!dive.lugarBuceo.toLowerCase().contains(query) &&
             !dive.operadoraBuceo.toLowerCase().contains(query) &&
-            !dive.descripcionTrabajo.toLowerCase().contains(query)) {
+            !dive.descripcionTrabajo.toLowerCase().contains(query) &&
+            !dive.buque.toLowerCase().contains(query)) {
           return false;
         }
       }
