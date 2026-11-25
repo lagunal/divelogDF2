@@ -1053,3 +1053,18 @@ users (1) ──< dive_sessions (many) ──── dive_details (1)
 
 5) CI (future)
 - Add GitHub Actions workflow to run `flutter analyze` and `flutter test`
+
+---
+
+## Toolchain Upgrade: Flutter 3.50 / Gradle 9.3.1 / AGP 9.1.1
+
+Trigger: Android emulator build failed ("Gradle 8.12.0 is lower than Flutter's minimum 9.3.1").
+
+- [x] Upgrade Flutter SDK 3.38.4 -> 3.50.1 (Dart 3.10.3 -> 3.14.0); `flutter pub get` resolves
+- [x] Gradle wrapper 8.12 -> 9.3.1 (`android/gradle/wrapper/gradle-wrapper.properties`)
+- [x] Android Gradle Plugin 8.9.1 -> 9.1.1 (`android/settings.gradle`, `android/build.gradle`)
+- [x] Verify: `./gradlew help` OK, `flutter build apk --debug` OK, `flutter analyze` has 0 errors/warnings (78 infos)
+- [ ] Testing phase: `flutter test` -> 33 pass / 14 fail (`ProviderNotFoundException`: tests do not provide `DiveProvider`); triage whether pre-existing
+- [ ] Follow-ups flagged by Flutter (non-blocking warnings): AGP >= 9.3.1 and Kotlin >= 2.4.20 soon; migrate app to Built-in Kotlin
+      (`android.builtInKotlin=false` opt-out currently set); plugins `purchases_ui_flutter` and `share_plus` still apply KGP
+- [ ] Follow-up: `package:flutter/material.dart` is deprecated in favor of `package:material_ui/material_ui.dart` (info-level)
