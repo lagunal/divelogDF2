@@ -2,7 +2,7 @@ name: divedatapro
 description: "DiveDataPro"
 publish_to: "none"
 
-version: 1.0.1+5
+version: 1.0.2+6
 
 environment:
   sdk: ^3.6.0
